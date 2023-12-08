@@ -49,6 +49,42 @@ CREATE TABLE IF NOT EXISTS resort(
 	half_pension BOOL
 	);
 	
+
+INSERT INTO public.room(
+	id, resort_id, sqm, price)
+	VALUES 
+('EH01', 1, 20, 2400),
+('HH01', 2, 30, 3000),
+('SH01', 3, 40, 1200),
+('FH01', 4, 20, 1500),
+('BM01', 5, 30, 1100),
+('HH02', 2, 40, 1300),
+('EH02', 1, 20, 2600),
+('SH02', 3, 30, 1600),
+('BM02', 5, 40, 1400),
+('FH02', 4, 20, 1300),
+('EH03', 1, 30, 1800),
+('HH03', 2, 40, 1700),
+('SH03', 3, 20, 1500),
+('FH03', 4, 30, 1400),
+('BM03', 5, 40, 1200),
+('HH06', 2, 20, 2500),
+('EH04', 1, 30, 2200),
+('SH04', 3, 40, 1600),
+('BM04', 5, 20, 1000),
+('FH04', 4, 30, 1600),
+('EH05', 1, 40, 2900),
+('HH04', 2, 20, 2200),
+('SH05', 3, 30, 1400),
+('BM05', 5, 40, 1500),
+('FH05', 4, 20, 1600),
+('EH06', 1, 30, 2600),
+('HH05', 2, 40, 1800),
+('SH06', 3, 20, 1600),
+('FH06', 4, 30, 1300),
+('BM06', 5, 40, 1700);
+
+/*
 INSERT INTO customer (firstname, lastname, email, phone, date_of_birth) 
 VALUES 
 ('Neron', 'Hrachovec', 'nhrachovec0@miitbeian.gov.cn', '+62 637 330 7995', '1993-06-03'),
@@ -71,6 +107,7 @@ VALUES
 ('Ariana', 'Klimaszewski', 'aklimaszewskih@cornell.edu', '+86 820 272 7993', '2002-12-24'),
 ('Kimbell', 'Yaxley', 'kyaxleyi@state.gov', '+373 793 238 0425', '1993-09-10'),
 ('Harwell', 'Ilchenko', 'hilchenkoj@goo.ne.jp', '+886 971 717 3898', '1988-10-03');
+*/
 
 
 /*
