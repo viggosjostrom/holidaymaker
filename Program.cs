@@ -7,8 +7,6 @@ await using var db = NpgsqlDataSource.Create(dbUri);
 
 await using var cmd = db.CreateCommand(@"
 
-DROP TABLE resort;
-DROP TABLE room;
     
 
 CREATE TABLE IF NOT EXISTS resort(
@@ -51,7 +49,15 @@ CREATE TABLE IF NOT EXISTS resort(
 	half_pension BOOL
 	);
 	
-	
+
+INSERT INTO public.resort(
+name, city, dist_beach, dist_centrum, pool, night_entertainment, child_club, resturant, stars)
+	VALUES
+	('Elite Hotels', 'Malmö', 250, 1000, '1', '1', '0', '1', 4),
+	('Hilton Hotels', 'Malmö', 500, 750, '1', '1', '1', '1', 5),
+	('Scandic Hotels', 'Helsingborg', 100, 400, '0', '0', '1', '1', 3),
+	('First Hotels', 'Åhus', 100, 1250, '0', '0', '0', '1', 3),
+	('Bjärnum Motel', 'Bjärnum', 50000, 0, '0', '0', '0', '1', 1);
 
 
 
@@ -59,4 +65,3 @@ CREATE TABLE IF NOT EXISTS resort(
 {
     await cmd.ExecuteNonQueryAsync();
 }
-
