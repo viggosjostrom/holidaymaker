@@ -5,13 +5,15 @@ string dbUri = "Host=localhost;Port=5455;Username=postgres;Password=postgres;Dat
 await using var db = NpgsqlDataSource.Create(dbUri);
 
 
+await using var cmd = db.CreateCommand(@"
 
+DROP TABLE resort;
+DROP TABLE room;
+    
 
-await using var cmd = db.CreateCommand(
-    @"CREATE TABLE IF NOT EXISTS resort(
+CREATE TABLE IF NOT EXISTS resort(
 	id SERIAL PRIMARY KEY,
 	name VARCHAR (255),
-	room_id INT,
 	city VARCHAR(255),
 	dist_beach INT,
 	dist_centrum INT,
@@ -32,7 +34,8 @@ await using var cmd = db.CreateCommand(
 	);
 
 	CREATE TABLE IF NOT EXISTS room(
-	id SERIAL PRIMARY KEY,
+	id VARCHAR(50) PRIMARY KEY,
+	resort_id INT,
 	sqm INT,
 	price INT
 	);
@@ -48,7 +51,7 @@ await using var cmd = db.CreateCommand(
 	half_pension BOOL
 	);
 	
-
+	
 
 
 
