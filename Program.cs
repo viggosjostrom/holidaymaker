@@ -37,6 +37,18 @@ await using var cmd = db.CreateCommand(
 	price INT
 	);
 
+	CREATE TABLE IF NOT EXISTS booking(
+	id SERIAL PRIMARY KEY,
+	room_id INT,
+	customer_id INT,
+	in_date DATE,
+	out_date DATE,
+	extra_bed BOOL,
+	all_inclusive BOOL,
+	half_pension BOOL
+	);
+	
+
 
 
 
