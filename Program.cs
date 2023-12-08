@@ -1,10 +1,14 @@
 ﻿using Npgsql;
 
-string dbUri= "Host=localhost;Port=5455;Username=postgres;Password=postgres;Database=holidaymaker"; //Inloggning till databasen port, password osv
+string dbUri = "Host=localhost;Port=5455;Username=postgres;Password=postgres;Database=holidaymaker"; //Inloggning till databasen port, password osv
 
 await using var db = NpgsqlDataSource.Create(dbUri);
 
-await using var cmd = db.CreateCommand(@"CREATE TABLE IF NOT EXISTS resort(
+
+
+
+await using var cmd = db.CreateCommand(
+    @"CREATE TABLE IF NOT EXISTS resort(
 	id SERIAL PRIMARY KEY,
 	name VARCHAR (255),
 	room_id INT,
@@ -16,4 +20,28 @@ await using var cmd = db.CreateCommand(@"CREATE TABLE IF NOT EXISTS resort(
 	child_club BOOL,
 	resturant BOOL,
 	stars INT
-	);");
+	);
+
+	CREATE TABLE IF NOT EXISTS customer(
+	id SERIAL PRIMARY KEY,
+	firstname VARCHAR (255),
+	lastname VARCHAR (255),
+	email VARCHAR (255),
+	phone VARCHAR (50),
+	date_of_birth DATE
+	);
+
+	CREATE TABLE IF NOT EXISTS room(
+	id SERIAL PRIMARY KEY,
+	sqm INT,
+	price INT
+	);
+
+
+
+
+");
+{
+    await cmd.ExecuteNonQueryAsync();
+}
+
