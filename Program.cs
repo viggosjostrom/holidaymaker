@@ -20,27 +20,27 @@ while (true)
 
             Register r = new Register();
             r.Customer();
-            break;
+            continue;
 
         case "2":
             Booking b = new Booking();
             b.New();
-            break;
+            continue;
 
         case "3":
 
 
             Booking e = new Booking();
             e.Edit(); 
-            break;
+            continue;
 
         case "4":
 
-            break;
+            continue;
 
 
         case "0":
-            System.Environment.Exit(1337);
+            System.Environment.Exit(666);
             Console.Clear();
             break;
 
@@ -51,7 +51,7 @@ while (true)
             //menu = true;
             Console.Clear();
             continue;
-            throw new Exception("CRASH!");
+            throw new Exception("unexpected CRASH!");
     }
 
 }
