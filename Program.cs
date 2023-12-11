@@ -29,6 +29,9 @@ while (true)
 
         case "3":
 
+
+            Booking e = new Booking();
+            e.Edit(); 
             break;
 
         case "4":

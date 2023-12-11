@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -63,9 +64,75 @@ public class Booking
         }
     }
 
-    public void Edit()
+    public async void Edit()
     {
+        string input = string.Empty;
+        Console.WriteLine("Please enter your bookingID: ");
+        int.TryParse(Console.ReadLine(), out int bookingID);
 
+        await using var db = NpgsqlDataSource.Create(dbUri);
+
+
+
+        while (true)
+        {
+
+            Console.WriteLine("What would you like to edit?");
+            Console.WriteLine("1: Change room");
+            Console.WriteLine("2: Change customer");
+            Console.WriteLine("3: Change check in date");
+            Console.WriteLine("4: Change checkout date");
+            Console.WriteLine("5: Change extra services");
+            Console.WriteLine("0: EXIT");
+            switch (Console.ReadLine())
+
+            {
+                case "1":
+                    Console.Clear();
+
+                    await using (var cmd = db.CreateCommand($"UPDATE public.booking SET room_id = $1 WHERE id = {bookingID}"))
+                    {
+                        Console.WriteLine("New room choice: ");
+                        cmd.Parameters.AddWithValue(Console.ReadLine());
+                        await cmd.ExecuteNonQueryAsync();
+
+                    }
+
+
+
+                    break;
+
+                case "2":
+                    break;
+
+                case "3":
+
+                    break;
+
+                case "4":
+
+                    break;
+
+                case "5":
+
+                    break;
+
+                case "0": // till main menu
+                    System.Environment.Exit(1337);
+                    Console.Clear();
+                    break;
+
+                default:
+                    Console.WriteLine("Invalid option");
+                    Console.WriteLine("Press any key to return to main menu");
+                    Console.ReadKey();
+                    //menu = true;
+                    Console.Clear();
+                    continue;
+                    throw new Exception("CRASH!");
+            }
+
+        }
     }
 
     public void Delete()
