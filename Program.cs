@@ -8,17 +8,18 @@ using System.Runtime.InteropServices;
 while (true)
 {
 
-    Console.WriteLine("1: New booking");
-    Console.WriteLine("2: Delete booking");
+    Console.WriteLine("1: Register new customer");
+    Console.WriteLine("2: New booking");
     Console.WriteLine("3: Edit booking");
+    Console.WriteLine("4: Delete booking");
     Console.WriteLine("0: EXIT");
     switch (Console.ReadLine())
 
     {
         case "1":
 
-            Booking customer = new Booking();
-            customer.New();
+            Register r = new Register();
+            r.Customer();
             break;
 
         case "2":
@@ -26,6 +27,10 @@ while (true)
             break;
 
         case "3":
+
+            break;
+
+        case "4":
 
             break;
 
