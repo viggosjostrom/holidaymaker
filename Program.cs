@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS resort(
 
 	CREATE TABLE IF NOT EXISTS booking(
 	id SERIAL PRIMARY KEY,
-	room_id INT,
+	room_id varchar(50),
 	customer_id INT,
 	in_date DATE,
 	out_date DATE,
@@ -138,9 +138,9 @@ VALUES
 ('EH05', 14, '2022-09-10', '2022-09-13', '0', '1', '0'),
 ('BM02', 8, '2022-09-15', '2022-09-18', '1', '1', '0'),
 ('SH06', 20, '2022-09-20', '2022-09-22', '0', '0', '1');
-*/
 
-/*
+
+
 INSERT INTO public.room(
 	id, resort_id, sqm, price)
 	VALUES 
@@ -174,8 +174,8 @@ INSERT INTO public.room(
 ('SH06', 3, 20, 1600),
 ('FH06', 4, 30, 1300),
 ('BM06', 5, 40, 1700);
-*/
-/*
+
+
 INSERT INTO customer (firstname, lastname, email, phone, date_of_birth) 
 VALUES 
 ('Neron', 'Hrachovec', 'nhrachovec0@miitbeian.gov.cn', '+62 637 330 7995', '1993-06-03'),
@@ -198,10 +198,10 @@ VALUES
 ('Ariana', 'Klimaszewski', 'aklimaszewskih@cornell.edu', '+86 820 272 7993', '2002-12-24'),
 ('Kimbell', 'Yaxley', 'kyaxleyi@state.gov', '+373 793 238 0425', '1993-09-10'),
 ('Harwell', 'Ilchenko', 'hilchenkoj@goo.ne.jp', '+886 971 717 3898', '1988-10-03');
-*/
 
 
-/*
+
+
 INSERT INTO public.resort(
 name, city, dist_beach, dist_centrum, pool, night_entertainment, child_club, resturant, stars)
 	VALUES
@@ -217,3 +217,40 @@ name, city, dist_beach, dist_centrum, pool, night_entertainment, child_club, res
 {
     await cmd.ExecuteNonQueryAsync();
 }
+
+
+
+Console.WriteLine("1: New booking");
+Console.WriteLine("2: Delete booking");
+Console.WriteLine("3: Edit booking");
+Console.WriteLine("0: EXIT");
+
+
+switch(Console.ReadLine())
+
+{
+	case "1":
+
+		break;
+
+	case "2":
+
+		break;
+
+	case "3":
+
+		break;
+
+	case "0":
+		System.Environment.Exit(1337)
+		break;
+
+	default:
+		Console.WriteLine("Invalid option");
+		Console.WriteLine("Press any key to return to main menu");
+		Console.ReadKey();
+		break;
+
+
+}
+
