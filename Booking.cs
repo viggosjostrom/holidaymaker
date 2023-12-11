@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mail;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using Npgsql;
+﻿using Npgsql;
 
 
 namespace holidaymaker;
@@ -66,6 +59,7 @@ public class Booking
 
     public async void Edit()
     {
+        Console.Clear();
         string input = string.Empty;
         Console.WriteLine("Please enter your bookingID: ");
         int.TryParse(Console.ReadLine(), out int bookingID);
@@ -76,7 +70,7 @@ public class Booking
 
         while (true)
         {
-
+            Console.Clear();
             Console.WriteLine("What would you like to edit?");
             Console.WriteLine("1: Change room");
             Console.WriteLine("2: Change customer");
@@ -84,6 +78,7 @@ public class Booking
             Console.WriteLine("4: Change checkout date");
             Console.WriteLine("5: Change extra services");
             Console.WriteLine("0: EXIT");
+
             switch (Console.ReadLine())
 
             {
@@ -95,17 +90,45 @@ public class Booking
                         Console.WriteLine("New room choice: ");
                         cmd.Parameters.AddWithValue(Console.ReadLine());
                         await cmd.ExecuteNonQueryAsync();
-
                     }
 
-
+                    Console.Clear();
+                    Console.WriteLine("You have now edited the room");
+                    Thread.Sleep(3000);
+                    Console.Clear();
 
                     break;
 
                 case "2":
+                    Console.Clear();
+
+                    await using (var cmd = db.CreateCommand($"UPDATE public.booking SET customer_id = $1 WHERE id = {bookingID}"))
+                    {
+                        Console.WriteLine("Change customer: ");
+                        int.TryParse(Console.ReadLine(), out int customerId);
+                        cmd.Parameters.AddWithValue(customerId);
+                        await cmd.ExecuteNonQueryAsync();
+                    }
+
+                    Console.Clear();
+                    Console.WriteLine("You have now changed the customer");
+                    Thread.Sleep(3000);
+                    Console.Clear();
+
                     break;
 
                 case "3":
+                    Console.Clear();
+
+                    await using (var cmd = db.CreateCommand($"UPDATE public.booking SET customer_id = $1 WHERE id = {bookingID}"))
+                    {
+                        Console.WriteLine("Change customer: ");
+                        int.TryParse(Console.ReadLine(), out int customerId);
+                        cmd.Parameters.AddWithValue(customerId);
+                        await cmd.ExecuteNonQueryAsync();
+
+                    }
+                    break;
 
                     break;
 
