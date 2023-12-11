@@ -48,7 +48,7 @@ public class Booking
             Console.WriteLine();
 
             // skip om all inclusive = true
-            Console.Write("Half Pension? true/false: ");
+            Console.Write("Half pension? true/false: ");
             bool.TryParse(Console.ReadLine(), out bool halfPensionBool);
             cmd.Parameters.AddWithValue(halfPensionBool);
             Console.WriteLine();
@@ -66,9 +66,10 @@ public class Booking
 
         await using var db = NpgsqlDataSource.Create(dbUri);
 
+        bool edit = true;
 
 
-        while (true)
+        while (edit)
         {
             Console.Clear();
             Console.WriteLine("What would you like to edit?");
@@ -90,12 +91,12 @@ public class Booking
                         Console.WriteLine("New room choice: ");
                         cmd.Parameters.AddWithValue(Console.ReadLine());
                         await cmd.ExecuteNonQueryAsync();
-                    }
 
                     Console.Clear();
                     Console.WriteLine("You have now edited the room");
                     Thread.Sleep(3000);
                     Console.Clear();
+                    }
 
                     break;
 
@@ -120,30 +121,58 @@ public class Booking
                 case "3":
                     Console.Clear();
 
-                    await using (var cmd = db.CreateCommand($"UPDATE public.booking SET customer_id = $1 WHERE id = {bookingID}"))
+                    await using (var cmd = db.CreateCommand($"UPDATE public.booking SET in_date = $1 WHERE id = {bookingID}"))
                     {
-                        Console.WriteLine("Change customer: ");
-                        int.TryParse(Console.ReadLine(), out int customerId);
-                        cmd.Parameters.AddWithValue(customerId);
+                        Console.WriteLine("New Date (checkin): ");
+                        DateOnly.TryParse(Console.ReadLine(), out DateOnly dateIn);
+                        cmd.Parameters.AddWithValue(dateIn);
                         await cmd.ExecuteNonQueryAsync();
 
                     }
                     break;
 
-                    break;
-
                 case "4":
+                    Console.Clear();
 
+                    await using (var cmd = db.CreateCommand($"UPDATE public.booking SET out_date = $1 WHERE id = {bookingID}"))
+                    {
+                        Console.WriteLine("New Date (checkout): ");
+                        DateOnly.TryParse(Console.ReadLine(), out DateOnly dateOut);
+                        cmd.Parameters.AddWithValue(dateOut);
+                        await cmd.ExecuteNonQueryAsync();
+
+                    }
                     break;
 
                 case "5":
 
+                    Console.Clear();
+
+                    await using (var cmd = db.CreateCommand($"UPDATE public.booking SET extra_bed = $1, all_inclusive = $2, half_pension = $3  WHERE id = {bookingID}"))
+                    {
+                        Console.WriteLine("Extra bed? true/false: ");
+                        bool.TryParse(Console.ReadLine(), out bool bed);
+                        cmd.Parameters.AddWithValue(bed);
+
+                        Console.WriteLine("All inclusive? true/false: ");
+                        bool.TryParse(Console.ReadLine(), out bool allInclusive);
+                        cmd.Parameters.AddWithValue(allInclusive);
+
+                        Console.WriteLine("Half pension true/false: ");
+                        bool.TryParse(Console.ReadLine(), out bool halfPension);
+                        cmd.Parameters.AddWithValue(halfPension);
+
+                        await cmd.ExecuteNonQueryAsync();
+
+                    }
                     break;
 
-                case "0": // till main menu
-                    System.Environment.Exit(1337);
+                case "0":
                     Console.Clear();
+                    edit = false;
                     break;
+
+
 
                 default:
                     Console.WriteLine("Invalid option");
