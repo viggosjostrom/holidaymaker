@@ -1,8 +1,53 @@
 ﻿using holidaymaker;
 using Npgsql;
+using System.Linq.Expressions;
+using System.Runtime.InteropServices;
 
-string dbUri = "Host=localhost;Port=5455;Username=postgres;Password=postgres;Database=holidaymaker"; //Inloggning till databasen port, password osv
+//await SetupDB.NewDB();
 
-await using var db = NpgsqlDataSource.Create(dbUri);
+while (true)
+{
 
-await SetupDB.NewDB();
+    Console.WriteLine("1: Register new customer");
+    Console.WriteLine("2: New booking");
+    Console.WriteLine("3: Edit booking");
+    Console.WriteLine("4: Delete booking");
+    Console.WriteLine("0: EXIT");
+    switch (Console.ReadLine())
+
+    {
+        case "1":
+
+            Register r = new Register();
+            r.Customer();
+            break;
+
+        case "2":
+
+            break;
+
+        case "3":
+
+            break;
+
+        case "4":
+
+            break;
+
+
+        case "0":
+            System.Environment.Exit(1337);
+            Console.Clear();
+            break;
+
+        default:
+            Console.WriteLine("Invalid option");
+            Console.WriteLine("Press any key to return to main menu");
+            Console.ReadKey();
+            //menu = true;
+            Console.Clear();
+            continue;
+            throw new Exception("CRASH!");
+    }
+
+}
