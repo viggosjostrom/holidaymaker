@@ -23,7 +23,8 @@ while (true)
             break;
 
         case "2":
-
+            Booking b = new Booking();
+            b.New();
             break;
 
         case "3":
