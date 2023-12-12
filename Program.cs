@@ -12,6 +12,7 @@ while (true)
     Console.WriteLine("2: New booking");
     Console.WriteLine("3: Edit booking");
     Console.WriteLine("4: Delete booking");
+    Console.WriteLine("5: Search free room");
     Console.WriteLine("0: EXIT");
     switch (Console.ReadLine())
 
@@ -36,6 +37,11 @@ while (true)
 
         case "4":
 
+            continue;
+
+        case "5":
+            Booking s = new Booking();
+            s.OrderBy();
             continue;
 
 
