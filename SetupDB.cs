@@ -23,51 +23,76 @@ public class SetupDB
 
     
 
-CREATE TABLE IF NOT EXISTS resort(
+	CREATE TABLE IF NOT EXISTS resort(
 	id SERIAL PRIMARY KEY,
-	name VARCHAR (255),
-	city VARCHAR(255),
+	name TEXT,
+	city TEXT,
 	dist_beach INT,
 	dist_centrum INT,
-	pool BOOL,
-	night_entertainment BOOL,
-	child_club BOOL,
-	resturant BOOL,
 	stars INT
 	);
 
 	CREATE TABLE IF NOT EXISTS customer(
 	id SERIAL PRIMARY KEY,
-	firstname VARCHAR (255),
-	lastname VARCHAR (255),
-	email VARCHAR (255),
-	phone VARCHAR (50),
+	firstname TEXT,
+	lastname TEXT,
+	email TEXT,
+	phone TEXT,
 	date_of_birth DATE
 	);
 
 	CREATE TABLE IF NOT EXISTS room(
-	id VARCHAR(50) PRIMARY KEY,
+	id SERIAL PRIMARY KEY,
+	name TEXT NOT NULL,
 	resort_id INT,
 	sqm INT,
-	price INT
+	price MONEY
 	);
 
 	CREATE TABLE IF NOT EXISTS booking(
 	id SERIAL PRIMARY KEY,
-	room_id VARCHAR(50),
+	resort_id INT,
+	room_id INT,
 	customer_id INT,
 	in_date DATE,
-	out_date DATE,
-	extra_bed BOOL,
-	all_inclusive BOOL,
-	half_pension BOOL
+	out_date DATE
 	);
 
 
+	CREATE TABLE IF NOT EXISTS amenities(
+	id SERIAL PRIMARY KEY,
+	name TEXT
+	);
+
+	CREATE TABLE IF NOT EXISTS extras(
+	id SERIAL PRIMARY KEY,	
+	name TEXT,
+	price MONEY
+	);
+
+	CREATE TABLE IF NOT EXISTS resort_x_amenities(
+	id SERIAL PRIMARY KEY,
+	resort_id SERIAL REFERENCES resort(id),
+	amenities_id SERIAL REFERENCES amenities(id)
+	);
+
+	CREATE TABLE IF NOT EXISTS resort_x_extras(
+	id SERIAL PRIMARY KEY,
+	resort_id SERIAL REFERENCES resort(id),
+	extras_id SERIAL REFERENCES extras(id)	
+	);
+
+	CREATE TABLE IF NOT EXISTS booking_x_extras(
+	id SERIAL PRIMARY KEY,
+	booking_id SERIAL REFERENCES booking(id),
+	extras_id SERIAL REFERENCES extras(id)	
+	);
 
 
+/*
 
-INSERT INTO public.booking (room_id, customer_id, in_date, out_date, extra_bed, all_inclusive, half_pension)
+
+INSERT INTO public.booking (resort_id, room_id, customer_id, in_date, out_date, extra_bed, all_inclusive, half_pension)
 VALUES
 ('BM05', 3, '2022-06-05', '2022-06-06', '1', '1', '0'),
 ('SH05', 17, '2022-06-10', '2022-06-13', '0', '1', '0'),
@@ -227,7 +252,8 @@ name, city, dist_beach, dist_centrum, pool, night_entertainment, child_club, res
 
 ALTER TABLE public.room ADD FOREIGN KEY (resort_id) references resort(id);
 ALTER TABLE public.booking ADD FOREIGN KEY (room_id) references room(id);
-ALTER TABLE public.booking ADD FOREIGN KEY (customer_id) references customer(id);	
+ALTER TABLE public.booking ADD FOREIGN KEY (customer_id) references customer(id);
+*/
 
 ");
         {
