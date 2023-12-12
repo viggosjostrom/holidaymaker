@@ -219,7 +219,7 @@ public class Booking
             case 2:
                 Console.WriteLine("What is the max distance to the centrum?");
                 int.TryParse(Console.ReadLine(), out int maxCentrum);
-                orderByResult = $"WHERE dist_beach <= {maxCentrum}";
+                orderByResult = $"WHERE dist_centrum <= {maxCentrum}";
                 break;
 
             case 3:
@@ -239,8 +239,6 @@ public class Booking
 
         await using (var cmd = db.CreateCommand($@" SELECT * FROM public.resort FULL JOIN room ON resort_id = resort.id {orderByResult};"))
         {
-
-
             await cmd.ExecuteNonQueryAsync();
         }
     }
