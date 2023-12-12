@@ -187,9 +187,19 @@ public class Booking
         }
     }
 
-    public void Delete()
+    public async void Delete()
     {
+        
+        await using var db = NpgsqlDataSource.Create(dbUri);
+        Console.WriteLine("Which booking would you like to delete? (Enter the bookingID)");
+        int.TryParse(Console.ReadLine(), out int bookingID);
 
+        await using (var cmd = db.CreateCommand($"DELETE FROM booking WHERE booking.id = {bookingID}"))
+        {
+            
+            await cmd.ExecuteNonQueryAsync();
+        }
+            
     }
 
     public async void OrderBy()
