@@ -36,7 +36,8 @@ while (true)
             continue;
 
         case "4":
-
+            Booking d = new Booking();
+            d.Delete();
             continue;
 
         case "5":
