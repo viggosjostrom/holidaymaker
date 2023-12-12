@@ -4,6 +4,8 @@ using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 
 //await SetupDB.NewDB();
+string dbUri = "Host=localhost;Port=5455;Username=postgres;Password=postgres;Database=holidaymaker"; //Inloggning till databasen port, password osv
+await using var db = NpgsqlDataSource.Create(dbUri);
 
 while (true)
 {
@@ -12,39 +14,37 @@ while (true)
     Console.WriteLine("2: New booking");
     Console.WriteLine("3: Edit booking");
     Console.WriteLine("4: Delete booking");
-    Console.WriteLine("5: Search free room");
+    Console.WriteLine("5: Search room");
     Console.WriteLine("0: EXIT");
     switch (Console.ReadLine())
 
     {
         case "1":
 
-            Register r = new Register();
-            r.Customer();
+            Register r = new Register(db);
+            await r.Customer();
             continue;
 
         case "2":
-            Booking b = new Booking();
-            b.New();
+            Booking b = new Booking(db);
+            await b.New();
             continue;
 
         case "3":
 
-
-            Booking e = new Booking();
-            e.Edit(); 
+            Booking e = new Booking(db);
+            await e.Edit(); 
             continue;
 
         case "4":
-            Booking d = new Booking();
-            d.Delete();
+            Booking d = new Booking(db);
+            await d.Delete();
             continue;
 
         case "5":
-            Booking s = new Booking();
-            s.OrderBy();
+            Booking s = new Booking(db);
+            await s.OrderBy();
             continue;
-
 
         case "0":
             System.Environment.Exit(666);
@@ -52,10 +52,8 @@ while (true)
             break;
 
         default:
-            Console.WriteLine("Invalid option");
-            Console.WriteLine("Press any key to return to main menu");
+            Console.WriteLine("Invalid option.\nPress any key to return to main menu");
             Console.ReadKey();
-            //menu = true;
             Console.Clear();
             continue;
             throw new Exception("unexpected CRASH!");

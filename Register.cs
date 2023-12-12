@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace holidaymaker;
 
-public class Register
+public class Register(NpgsqlDataSource db)
 {
 
     string dbUri = "Host=localhost;Port=5455;Username=postgres;Password=postgres;Database=holidaymaker"; //Inloggning till databasen port, password osv
@@ -20,10 +20,9 @@ public class Register
     public string? phone = string.Empty;
     public string? dateOfBirth = string.Empty;
 
-    public async void Customer()
+    public async Task Customer()
 
     {
-        await using var db = NpgsqlDataSource.Create(dbUri);
 
         await using (var cmd = db.CreateCommand("INSERT INTO customer (firstname, lastname, email, phone, date_of_birth) VALUES ($1, $2, $3, $4, $5)"))
         {
