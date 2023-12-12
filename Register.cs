@@ -10,9 +10,6 @@ namespace holidaymaker;
 public class Register(NpgsqlDataSource db)
 {
 
-    string dbUri = "Host=localhost;Port=5455;Username=postgres;Password=postgres;Database=holidaymaker"; //Inloggning till databasen port, password osv
-
-
 
     public string? firstName = string.Empty;
     public string? lastName = string.Empty;
