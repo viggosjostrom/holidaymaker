@@ -4,17 +4,16 @@
 namespace holidaymaker;
 
 
-public class Booking
+public class Booking(NpgsqlDataSource db)
 {
     string dbUri = "Host=localhost;Port=5455;Username=postgres;Password=postgres;Database=holidaymaker"; //Inloggning till databasen port, password osv
 
 
-    public async void New()
+    public async Task New()
 
     {
-        await using var db = NpgsqlDataSource.Create(dbUri);
 
-        await using (var cmd = db.CreateCommand("INSERT INTO booking (room_id, customer_id, in_date, out_date, extra_bed, all_inclusive, half_pension) VALUES ($1, $2, $3, $4, $5, $6, $7)"))
+        await using (var cmd = db.CreateCommand("INSERT INTO booking (name, customer_id, in_date, out_date) VALUES ($1, $2, $3, $4)"))
         {
 
             Console.Write("Enter room number to book: ");
@@ -37,34 +36,17 @@ public class Booking
             cmd.Parameters.AddWithValue(dateOut);
             Console.WriteLine();
 
-            Console.Write("Extra bed? true/false: ");
-            bool.TryParse(Console.ReadLine(), out bool bedBool);
-            cmd.Parameters.AddWithValue(bedBool);
-            Console.WriteLine();
-
-            Console.Write("All inclusive? true/false: ");
-            bool.TryParse(Console.ReadLine(), out bool allInclusiveBool);
-            cmd.Parameters.AddWithValue(allInclusiveBool);
-            Console.WriteLine();
-
-            // skip om all inclusive = true
-            Console.Write("Half pension? true/false: ");
-            bool.TryParse(Console.ReadLine(), out bool halfPensionBool);
-            cmd.Parameters.AddWithValue(halfPensionBool);
-            Console.WriteLine();
-
             await cmd.ExecuteNonQueryAsync();
         }
     }
 
-    public async void Edit()
+    public async Task Edit()
     {
         Console.Clear();
         string input = string.Empty;
         Console.WriteLine("Please enter your bookingID: ");
         int.TryParse(Console.ReadLine(), out int bookingID);
 
-        await using var db = NpgsqlDataSource.Create(dbUri);
 
         bool edit = true;
 
@@ -77,7 +59,6 @@ public class Booking
             Console.WriteLine("2: Change customer");
             Console.WriteLine("3: Change check in date");
             Console.WriteLine("4: Change checkout date");
-            Console.WriteLine("5: Change extra services");
             Console.WriteLine("0: EXIT");
 
             switch (Console.ReadLine())
@@ -144,28 +125,6 @@ public class Booking
                     }
                     break;
 
-                case "5":
-
-                    Console.Clear();
-
-                    await using (var cmd = db.CreateCommand($"UPDATE public.booking SET extra_bed = $1, all_inclusive = $2, half_pension = $3  WHERE id = {bookingID}"))
-                    {
-                        Console.WriteLine("Extra bed? true/false: ");
-                        bool.TryParse(Console.ReadLine(), out bool bed);
-                        cmd.Parameters.AddWithValue(bed);
-
-                        Console.WriteLine("All inclusive? true/false: ");
-                        bool.TryParse(Console.ReadLine(), out bool allInclusive);
-                        cmd.Parameters.AddWithValue(allInclusive);
-
-                        Console.WriteLine("Half pension true/false: ");
-                        bool.TryParse(Console.ReadLine(), out bool halfPension);
-                        cmd.Parameters.AddWithValue(halfPension);
-
-                        await cmd.ExecuteNonQueryAsync();
-
-                    }
-                    break;
 
                 case "0":
                     Console.Clear();
@@ -187,35 +146,33 @@ public class Booking
         }
     }
 
-    public async void Delete()
+    public async Task Delete()
     {
-        
-        await using var db = NpgsqlDataSource.Create(dbUri);
+
         Console.WriteLine("Which booking would you like to delete? (Enter the bookingID)");
         int.TryParse(Console.ReadLine(), out int bookingID);
 
         await using (var cmd = db.CreateCommand($"DELETE FROM booking WHERE booking.id = {bookingID}"))
         {
-            
+
             await cmd.ExecuteNonQueryAsync();
         }
-            
+
     }
 
-    public async void OrderBy()
+    public async Task OrderBy()
     {
 
-        await using var db = NpgsqlDataSource.Create(dbUri);
 
-       
-            Console.WriteLine("What do you want to order by?");
-            Console.WriteLine("1: Distance beach");
-            Console.WriteLine("2: Distance to centrum");
-            Console.WriteLine("3: Price");
-            Console.WriteLine("4: Stars");
-            Console.WriteLine("");
 
-            int input = int.Parse(Console.ReadLine());
+        Console.WriteLine("What do you want to order by?");
+        Console.WriteLine("1: Distance beach");
+        Console.WriteLine("2: Distance to centrum");
+        Console.WriteLine("3: Price");
+        Console.WriteLine("4: Stars");
+        Console.WriteLine("");
+
+        int input = int.Parse(Console.ReadLine());
         string orderByResult = string.Empty;
         switch (input)
         {
@@ -252,6 +209,53 @@ public class Booking
             await cmd.ExecuteNonQueryAsync();
         }
     }
-    
+    public async Task Search()
+    {
+
+
+
+        string query = "select * from booking";
+        var reader = await db.CreateCommand(query).ExecuteReaderAsync();
+
+        while (await reader.ReadAsync())
+        {
+            Console.WriteLine(reader.GetInt32(0) + ", " + reader.GetString(1));
+
+
+
+        }
+
+    }
+
+    public class SearchPage(NpgsqlDataSource db)
+    {
+        public async Task<string> Allbookings()
+        {
+            string result = string.Empty;
+
+
+            string query = "select * from booking";
+            var reader = await db.CreateCommand(query).ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                // Console.WriteLine(reader.GetInt32(0) + ", " + reader.GetString(1));
+                result += reader.GetInt32(0);
+                result += ", ";
+                result += reader.GetString(1);
+                 
+
+            }
+
+            return result;
+
+        }
+
+
+
+    }
+
+
 }
+
 
