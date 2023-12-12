@@ -199,10 +199,10 @@ public class Booking
 
        
             Console.WriteLine("What do you want to order by?");
-            Console.WriteLine("Distance beach<={input}");
-            Console.WriteLine("Distance to centrum<={input}");
-            Console.WriteLine("Price(ASC)");
-            Console.WriteLine("Stars(DESC)");
+            Console.WriteLine("1: Distance beach");
+            Console.WriteLine("2: Distance to centrum");
+            Console.WriteLine("3: Price");
+            Console.WriteLine("4: Stars");
             Console.WriteLine("");
 
             int input = int.Parse(Console.ReadLine());
@@ -237,7 +237,7 @@ public class Booking
         }
 
 
-        await using (var cmd = db.CreateCommand($@" SELECT * FROM public.resort FULL JOIN room ON resort_id = resort.id {orderByResult};"))
+        await using (var cmd = db.CreateCommand($@" SELECT * FROM public.resort JOIN room ON resort_id = resort.id {orderByResult};"))
         {
             await cmd.ExecuteNonQueryAsync();
         }
