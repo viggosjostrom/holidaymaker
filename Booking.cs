@@ -92,10 +92,10 @@ public class Booking
                         cmd.Parameters.AddWithValue(Console.ReadLine());
                         await cmd.ExecuteNonQueryAsync();
 
-                    Console.Clear();
-                    Console.WriteLine("You have now edited the room");
-                    Thread.Sleep(3000);
-                    Console.Clear();
+                        Console.Clear();
+                        Console.WriteLine("You have now edited the room");
+                        Thread.Sleep(3000);
+                        Console.Clear();
                     }
 
                     break;
@@ -192,6 +192,56 @@ public class Booking
 
     }
 
+    public async void OrderBy()
+    {
 
+        await using var db = NpgsqlDataSource.Create(dbUri);
+
+       
+            Console.WriteLine("What do you want to order by?");
+            Console.WriteLine("Distance beach<={input}");
+            Console.WriteLine("Distance to centrum<={input}");
+            Console.WriteLine("Price(ASC)");
+            Console.WriteLine("Stars(DESC)");
+            Console.WriteLine("");
+
+            int input = int.Parse(Console.ReadLine());
+        string orderByResult = string.Empty;
+        switch (input)
+        {
+
+            case 1:
+                Console.WriteLine("What is the max distance to the beach?");
+                int.TryParse(Console.ReadLine(), out int maxBeach);
+                orderByResult = $"WHERE dist_beach <= {maxBeach}";
+                break;
+
+            case 2:
+                Console.WriteLine("What is the max distance to the centrum?");
+                int.TryParse(Console.ReadLine(), out int maxCentrum);
+                orderByResult = $"WHERE dist_centrum <= {maxCentrum}";
+                break;
+
+            case 3:
+                orderByResult = "ORDER BY price ASC";
+                break;
+
+            case 4:
+                orderByResult = "ORDER BY stars DESC";
+                break;
+
+
+            default:
+                Console.WriteLine("Sorry this was not a valid choice.");
+                break;
+        }
+
+
+        await using (var cmd = db.CreateCommand($@" SELECT * FROM public.resort FULL JOIN room ON resort_id = resort.id {orderByResult};"))
+        {
+            await cmd.ExecuteNonQueryAsync();
+        }
+    }
+    
 }
 
