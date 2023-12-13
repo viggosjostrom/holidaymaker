@@ -57,15 +57,13 @@ while (true)
             Console.ReadKey();
             Console.Clear();
             continue;
-            throw new Exception("unexpected CRASH!");
     }
 
     }
     else
     {
-        // Lade till detta eftersom jag har lagt in en if(tryparse) så om man gör fel så ska detta dyka upp
-        Console.WriteLine("Wrong input, please try again. Enter a number between 1 - 5 for and option or enter 0 to exit the program.\n");
-        Console.Write("Press any key to go back to main menu");
+        Console.WriteLine("Wrong input");
+        Console.WriteLine("Press any key to go back to main menu");
         Console.ReadKey();
         continue;
     }

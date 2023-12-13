@@ -5,38 +5,102 @@ namespace holidaymaker;
 
 public class Booking(NpgsqlDataSource db)
 {
-    string dbUri =
-        "Host=localhost;Port=5455;Username=postgres;Password=postgres;Database=holidaymaker"; //Inloggning till databasen port, password osv
-
-
     public async Task New()
-
     {
-        await using (var cmd = db.CreateCommand(
-                         "INSERT INTO booking (name /* vad menas med name här? */, customer_id, in_date, out_date) VALUES ($1, $2, $3, $4)"))
+        bool resort = true;
+        bool room = false;
+        bool customer = false;
+        bool datefirst = false;
+        bool dateSecond = false;
+        Console.Clear();
+        while (true)
         {
-            Console.Write("Enter room number to book: ");
-            int.TryParse(Console.ReadLine(), out int room_number); //Added a tryparse here.
-            cmd.Parameters.AddWithValue(room_number); // added the room_number output instead of the console.readline
-            Console.WriteLine();
+            await using (var cmd = db.CreateCommand(
+                             "INSERT INTO booking (resort_id, room_id, customer_id, in_date, out_date) VALUES ($1, $2, $3, $4, $5)"))
+            {
+                if (resort)
+                {
+                    Console.Write("Enter resort id: ");
+                    if (!int.TryParse(Console.ReadLine(), out int resort_id))
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Wrong input, try again! ");
+                        continue;
+                    }
 
-            Console.Write("Enter customer to book: ");
-            int.TryParse(Console.ReadLine(), out int customerID);
-            cmd.Parameters.AddWithValue(customerID);
-            Console.WriteLine();
+                    cmd.Parameters.AddWithValue(resort_id);
+                    resort = false;
+                    room = true;
+                    Console.Clear();
+                }
 
-            Console.Write("Check In date (YYYY-MM-DD): ");
-            DateOnly.TryParse(Console.ReadLine(), out DateOnly dateIn);
-            cmd.Parameters.AddWithValue(dateIn);
-            Console.WriteLine();
+                if (room)
+                {
+                    Console.Write("Enter room id: ");
+                    if (!int.TryParse(Console.ReadLine(), out int room_id))
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Wrong input, try again! ");
+                        continue;
+                    }
 
-            // ska inte kunna vara ett datum innan check in
-            Console.Write("Check Out date (YYYY-MM-DD): ");
-            DateOnly.TryParse(Console.ReadLine(), out DateOnly dateOut);
-            cmd.Parameters.AddWithValue(dateOut);
-            Console.WriteLine();
+                    cmd.Parameters.AddWithValue(room_id);
+                    room = false;
+                    customer = true;
+                    Console.Clear();
+                }
 
-            await cmd.ExecuteNonQueryAsync();
+                if (customer)
+                {
+                    Console.Write("Enter customer id: ");
+                    if (!int.TryParse(Console.ReadLine(), out int customer_id))
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Wrong input, try again! ");
+                        continue;
+                    }
+
+                    cmd.Parameters.AddWithValue(customer_id);
+                    customer = false;
+                    datefirst = true;
+                    Console.Clear();
+                }
+
+                if (datefirst)
+                {
+                    Console.Write("Enter in date (YYYY-MM-DD): ");
+                    if (!DateOnly.TryParse(Console.ReadLine(), out DateOnly in_date))
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Wrong input, try again! ");
+                        continue;
+                    }
+
+                    cmd.Parameters.AddWithValue(in_date);
+                    datefirst = false;
+                    dateSecond = true;
+                    Console.Clear();
+                }
+
+                if (dateSecond)
+                {
+                    Console.Write("Enter out date (YYYY-MM-DD): ");
+                    if (!DateOnly.TryParse(Console.ReadLine(), out DateOnly out_date))
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Wrong input, try again! ");
+                        continue;
+                    }
+
+                    cmd.Parameters.AddWithValue(out_date);
+                    Console.Clear();
+                    Console.Write("well done, mission accomplished! ");
+                    Console.ReadKey();
+                }
+
+                await cmd.ExecuteNonQueryAsync();
+                break;
+            }
         }
     }
 
@@ -44,10 +108,7 @@ public class Booking(NpgsqlDataSource db)
     {
         Console.Clear();
         Console.WriteLine("Please enter your bookingID: ");
-        string
-            userInput = Console
-                .ReadLine(); // Added a userInput so that I can tryparse with an If so that I can handle unexpected input.
-        if (int.TryParse(userInput, out int bookingID))
+        if (int.TryParse(Console.ReadLine(), out int bookingID))
         {
             bool edit = true;
 
@@ -148,8 +209,7 @@ public class Booking(NpgsqlDataSource db)
         }
         else
         {
-            Console.WriteLine(
-                "Wrong input please try again. Enter a number between 1 - 4 to choose an option or 0 to exit");
+            Console.WriteLine("Wrong input please try again. Enter a bookingID (number) or 0 to exit");
             Console.WriteLine("Press any key to return to menu");
             Console.ReadKey();
             Console.Clear();
@@ -184,7 +244,8 @@ public class Booking(NpgsqlDataSource db)
         Console.WriteLine("4: Stars");
         Console.WriteLine("");
 
-        if (int.TryParse(Console.ReadLine(), out int input))    // Lade till en if med tryparse för att kunna hantera oväntade inputs
+        if (int.TryParse(Console.ReadLine(),
+                out int input)) // Lade till en if med tryparse för att kunna hantera oväntade inputs
         {
             //int input = int.Parse(Console.ReadLine());
             string orderByResult = string.Empty;
