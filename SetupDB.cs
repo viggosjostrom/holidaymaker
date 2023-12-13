@@ -11,9 +11,8 @@ public class SetupDB()
 {
     public static async Task NewDB()
     {
-
-        string dbUri = "Host=localhost;Port=5455;Username=postgres;Password=postgres;Database=holidaymaker"; //Inloggning till databasen port, password osv
-
+        string dbUri =
+            "Host=localhost;Port=5455;Username=postgres;Password=postgres;Database=holidaymaker"; //Inloggning till databasen port, password osv
 
 
         await using var db = NpgsqlDataSource.Create(dbUri);
@@ -21,158 +20,127 @@ public class SetupDB()
 
         await using var cmd = db.CreateCommand(@"
 
-    
 
-	CREATE TABLE IF NOT EXISTS resort(
-	id SERIAL PRIMARY KEY,
-	name TEXT,
-	city TEXT,
-	dist_beach INT,
-	dist_centrum INT,
-	stars INT
-	);
+        CREATE TABLE IF NOT EXISTS resort(
+            id SERIAL
 
-	CREATE TABLE IF NOT EXISTS customer(
-	id SERIAL PRIMARY KEY,
-	firstname TEXT,
-	lastname TEXT,
-	email TEXT,
-	phone TEXT,
-	date_of_birth DATE
-	);
-
-	CREATE TABLE IF NOT EXISTS room(
-	id SERIAL PRIMARY KEY,
-	name TEXT NOT NULL,
-	resort_id INT,
-	sqm INT,
-	price MONEY
-	);
-
-	CREATE TABLE IF NOT EXISTS booking(
-	id SERIAL PRIMARY KEY,
-	resort_id INT,
-	room_id INT,
-	customer_id INT,
-	in_date DATE,
-	out_date DATE
-	);
+        PRIMARY KEY,
+            name TEXT,
+        city TEXT,
+            dist_beach INT,
+        dist_centrum INT,
+            stars INT
+            );
 
 
-	CREATE TABLE IF NOT EXISTS amenities(
-	id SERIAL PRIMARY KEY,
-	name TEXT
-	);
+        CREATE TABLE IF NOT EXISTS customer(
+            id SERIAL
 
-	CREATE TABLE IF NOT EXISTS extras(
-	id SERIAL PRIMARY KEY,	
-	name TEXT,
-	price MONEY		
-	);
+        PRIMARY KEY,
+            firstname TEXT,
+        lastname TEXT,
+            email TEXT,
+        phone TEXT,
+            date_of_birth DATE
+            );
 
-	CREATE TABLE IF NOT EXISTS resort_x_amenities(
-	id SERIAL PRIMARY KEY,
-	resort_id SERIAL REFERENCES resort(id),
-	amenities_id SERIAL REFERENCES amenities(id)
-	);
 
-	CREATE TABLE IF NOT EXISTS resort_x_extras(
-	id SERIAL PRIMARY KEY,
-	resort_id SERIAL REFERENCES resort(id),
-	extras_id SERIAL REFERENCES extras(id)	
-	);
+        CREATE TABLE IF NOT EXISTS room(
+            id SERIAL
 
-	CREATE TABLE IF NOT EXISTS booking_x_extras(
-	id SERIAL PRIMARY KEY,
-	booking_id SERIAL REFERENCES booking(id),
-	extras_id SERIAL REFERENCES extras(id)	
-	);
+        PRIMARY KEY,
+            name TEXT NOT NULL,
+            resort_id INT,
+        sqm INT,
+            price MONEY
+            );
+
+
+        CREATE TABLE IF NOT EXISTS booking(
+            id SERIAL
+
+        PRIMARY KEY,
+            resort_id INT,
+        room_id INT,
+            customer_id INT,
+        in_date DATE,
+            out_date DATE
+            );
+
+
+        CREATE TABLE IF NOT EXISTS amenities(
+            id SERIAL
+
+        PRIMARY KEY,
+            name TEXT
+            );
+
+
+        CREATE TABLE IF NOT EXISTS extras(
+            id SERIAL
+
+        PRIMARY KEY,
+            name TEXT,
+        price MONEY
+            );
+
+
+        CREATE TABLE IF NOT EXISTS resort_x_amenities(
+            id SERIAL
+
+        PRIMARY KEY,
+            resort_id SERIAL REFERENCES resort(id),
+        amenities_id SERIAL REFERENCES amenities(id)
+            );
+
+
+        CREATE TABLE IF NOT EXISTS resort_x_extras(
+            id SERIAL
+
+        PRIMARY KEY,
+            resort_id SERIAL REFERENCES resort(id),
+        extras_id SERIAL REFERENCES extras(id)
+            );
+
+
+        CREATE TABLE IF NOT EXISTS booking_x_extras(
+            id SERIAL
+
+        PRIMARY KEY,
+            booking_id SERIAL REFERENCES booking(id),
+        extras_id SERIAL REFERENCES extras(id)
+            );
 
 
 /*
 INSERT INTO public.amenities(
 name)
-	VALUES
-	('pool'),('restaurant'),('childclub'),('night entertainment');
+    VALUES
+    ('pool'),('restaurant'),('childclub'),('night entertainment');
+
+
 
 INSERT INTO public.extras(
     name, price)
-    VALUES 
+    VALUES
     ('Extra bed', 50),
     ('All inclusive', 1000),
     ('Half pension', 500);
-
-INSERT INTO public.booking_x_extras(
-    booking_id, extras_id)
-    VALUES 
-    (4, 2),
-	(4, 1),
-	(59, 3),
-	(32, 2),
-	(17, 1),
-	(45, 2),
-	(8, 1),
-	(21, 3),
-	(12, 2),
-	(53, 3),
-	(41, 2),
-	(3, 1),
-	(27, 3),
-	(60, 2),
-	(14, 1),
-	(37, 2),
-	(50, 2),
-	(9, 3),
-	(28, 1),
-	(6, 1);
-
-INSERT INTO public.resort_x_amenities(
-    resort_id, amenities_id)
-    VALUES 
-    (1, 1),
-    (1, 2),
-	(1, 4),
-    (2, 1),
-	(2, 2),
-    (2, 3),
-	(2, 4),
-    (3, 2),
-	(3, 4),
-    (4, 2),
-	(4, 3),
-    (4, 1),
-	(5, 2);
-
-INSERT INTO public.resort_x_extras(
-    resort_id, extras_id)
-    VALUES 
-    (1, 1),
-    (1, 2),
-	(1, 3),
-    (2, 1),
-	(2, 2),
-    (2, 3),
-	(3, 1),
-    (3, 3),
-	(4, 1),
-    (4, 3),
-	(5, 1);
-
 
 
 
 INSERT INTO public.resort(
 name, city, dist_beach, dist_centrum, stars)
-	VALUES
-	('Elite Hotels', 'Malmö', 250, 1000, 4),
-	('Hilton Hotels', 'Malmö', 500, 750, 5),
-	('Scandic Hotels', 'Helsingborg', 100, 400, 3),
-	('First Hotels', 'Åhus', 100, 1250, 3),
-	('Bjärnum Motel', 'Bjärnum', 50000, 0, 1);
-	
+    VALUES
+    ('Elite Hotels', 'Malmö', 250, 1000, 4),
+    ('Hilton Hotels', 'Malmö', 500, 750, 5),
+    ('Scandic Hotels', 'Helsingborg', 100, 400, 3),
+    ('First Hotels', 'Åhus', 100, 1250, 3),
+    ('Bjärnum Motel', 'Bjärnum', 50000, 0, 1);
+
 INSERT INTO public.room(
-	name, resort_id, sqm, price)
-	VALUES 
+    name, resort_id, sqm, price)
+    VALUES
 ('EH01', 1, 20, 2400),
 ('HH01', 2, 30, 3000),
 ('SH01', 3, 40, 1200),
@@ -275,10 +243,8 @@ VALUES
 
 
 
-
-
-INSERT INTO customer (firstname, lastname, email, phone, date_of_birth) 
-VALUES 
+INSERT INTO customer (firstname, lastname, email, phone, date_of_birth)
+VALUES
 ('Neron', 'Hrachovec', 'nhrachovec0@miitbeian.gov.cn', '+62 637 330 7995', '1993-06-03'),
 ('Aila', 'Willwood', 'awillwood1@plala.or.jp', '+51 544 970 1128', '2002-12-19'),
 ('Hadleigh', 'Torricina', 'htorricina2@wisc.edu', '+420 517 729 7176', '1985-07-15'),
@@ -302,19 +268,77 @@ VALUES
 
 
 
+INSERT INTO public.booking_x_extras(
+    booking_id, extras_id)
+    VALUES
+    (4, 2),
+    (4, 1),
+    (59, 3),
+    (32, 2),
+    (17, 1),
+    (45, 2),
+    (8, 1),
+    (21, 3),
+    (12, 2),
+    (53, 3),
+    (41, 2),
+    (3, 1),
+    (27, 3),
+    (60, 2),
+    (14, 1),
+    (37, 2),
+    (50, 2),
+    (9, 3),
+    (28, 1),
+    (6, 1);
+
+
+
+INSERT INTO public.resort_x_amenities(
+    resort_id, amenities_id)
+    VALUES
+    (1, 1),
+    (1, 2),
+    (1, 4),
+    (2, 1),
+    (2, 2),
+    (2, 3),
+    (2, 4),
+    (3, 2),
+    (3, 4),
+    (4, 2),
+    (4, 3),
+    (4, 1),
+    (5, 2);
+
+
+
+INSERT INTO public.resort_x_extras(
+    resort_id, extras_id)
+    VALUES
+    (1, 1),
+    (1, 2),
+    (1, 3),
+    (2, 1),
+    (2, 2),
+    (2, 3),
+    (3, 1),
+    (3, 3),
+    (4, 1),
+    (4, 3),
+    (5, 1);
 
 
 
 ALTER TABLE public.room ADD FOREIGN KEY (resort_id) references resort(id);
 ALTER TABLE public.booking ADD FOREIGN KEY (room_id) references room(id);
 ALTER TABLE public.booking ADD FOREIGN KEY (customer_id) references customer(id);
+
 */
 
-");
+        ");
         {
         }
         await cmd.ExecuteNonQueryAsync();
     }
-
-
 }

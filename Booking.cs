@@ -6,8 +6,7 @@ namespace holidaymaker;
 
 public class Booking(NpgsqlDataSource db)
 {
-
-
+    
     public async Task New()
 
     {
