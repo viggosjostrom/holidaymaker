@@ -43,7 +43,6 @@ public class Booking(NpgsqlDataSource db)
                         Console.WriteLine("Wrong input, try again! ");
                         continue;
                     }
-
                     cmd.Parameters.AddWithValue(room_id);
                     room = false;
                     customer = true;

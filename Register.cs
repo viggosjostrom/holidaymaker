@@ -10,10 +10,6 @@ namespace holidaymaker;
 public class Register(NpgsqlDataSource db)
 {
 
-    string dbUri = "Host=localhost;Port=5455;Username=postgres;Password=postgres;Database=holidaymaker"; //Inloggning till databasen port, password osv
-
-
-
     public string? firstName = string.Empty;
     public string? lastName = string.Empty;
     public string? email = string.Empty;
@@ -23,6 +19,7 @@ public class Register(NpgsqlDataSource db)
     public async Task Customer()
 
     {
+
 
         await using (var cmd = db.CreateCommand("INSERT INTO customer (firstname, lastname, email, phone, date_of_birth) VALUES ($1, $2, $3, $4, $5)"))
         {
