@@ -24,6 +24,7 @@ public class Register(NpgsqlDataSource db)
 
     {
 
+
         await using (var cmd = db.CreateCommand("INSERT INTO customer (firstname, lastname, email, phone, date_of_birth) VALUES ($1, $2, $3, $4, $5)"))
         {
 
