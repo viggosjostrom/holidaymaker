@@ -3,7 +3,7 @@ using Npgsql;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 
-//await SetupDB.NewDB();
+await SetupDB.NewDB();
 string dbUri = "Host=localhost;Port=5455;Username=postgres;Password=postgres;Database=holidaymaker"; //Inloggning till databasen port, password osv
 await using var db = NpgsqlDataSource.Create(dbUri);
 
