@@ -6,7 +6,6 @@ namespace holidaymaker;
 
 public class Booking(NpgsqlDataSource db)
 {
-    string dbUri = "Host=localhost;Port=5455;Username=postgres;Password=postgres;Database=holidaymaker"; //Inloggning till databasen port, password osv
 
 
     public async Task New()
