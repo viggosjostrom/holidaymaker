@@ -16,7 +16,7 @@ public class Booking(NpgsqlDataSource db)
         while (true)
         {
             await using (var cmd = db.CreateCommand(
-                             "INSERT INTO booking (resort_id, room_id, customer_id, in_date, out_date) VALUES ($1, $2, $3, $4, $5)"))
+                             "INSERT INTO booking (resort_id, room_id, in_date, out_date) VALUES ($1, $2, $3, $4)"))
             {
                 if (resort)
                 {
@@ -49,21 +49,7 @@ public class Booking(NpgsqlDataSource db)
                     Console.Clear();
                 }
 
-                if (customer)
-                {
-                    Console.Write("Enter customer id: ");
-                    if (!int.TryParse(Console.ReadLine(), out int customer_id))
-                    {
-                        Console.Clear();
-                        Console.WriteLine("Wrong input, try again! ");
-                        continue;
-                    }
 
-                    cmd.Parameters.AddWithValue(customer_id);
-                    customer = false;
-                    datefirst = true;
-                    Console.Clear();
-                }
 
                 if (datefirst)
                 {
