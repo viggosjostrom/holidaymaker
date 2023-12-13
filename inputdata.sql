@@ -1,25 +1,3 @@
-﻿using Npgsql;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace holidaymaker;
-
-public class SetupDB()
-{
-    public static async Task NewDB()
-    {
-        string dbUri =
-            "Host=localhost;Port=5455;Username=postgres;Password=postgres;Database=holidaymaker"; //Inloggning till databasen port, password osv
-
-
-        await using var db = NpgsqlDataSource.Create(dbUri);
-
-
-        await using var cmd = db.CreateCommand(@"
-
 	CREATE TABLE IF NOT EXISTS resort(
 	id SERIAL PRIMARY KEY,
 	name TEXT,
@@ -85,20 +63,12 @@ public class SetupDB()
 	extras_id SERIAL REFERENCES extras(id)	
 	);
 
-	CREATE TABLE IF NOT EXISTS customer_x_booking(
-	id SERIAL PRIMARY KEY,
-	booking_id SERIAL REFERENCES booking(id),
-	customer_id SERIAL REFERENCES customer(id)
-	);
 
-/*
+
 INSERT INTO public.amenities(
 name)
 	VALUES
-	('pool'),
-	('restaurant'),
-	('childclub'),
-	('night entertainment');
+	('pool'),('restaurant'),('childclub'),('night entertainment');
 
 INSERT INTO public.extras(
     name, price)
@@ -106,6 +76,10 @@ INSERT INTO public.extras(
     ('Extra bed', 50),
     ('All inclusive', 1000),
     ('Half pension', 500);
+
+
+
+
 
 INSERT INTO public.resort(
 name, city, dist_beach, dist_centrum, stars)
@@ -304,128 +278,7 @@ INSERT INTO public.resort_x_extras(
 	(4, 1),
     (4, 3),
 	(5, 1);
-	
-	
-	
-INSERT INTO public.customer_x_booking(
-	booking_id, customer_id)
-	VALUES 
-	
-(17, 6),
-(13, 9),
-(8, 15),
-(16, 10),
-(2, 5),
-(20, 13),
-(9, 12),
-(10, 3),
-(6, 16),
-(12, 14),
-(18, 8),
-(11, 2),
-(19, 1),
-(5, 18),
-(7, 4),
-(14, 7),
-(3, 11),
-(15, 17),
-(4, 20),
-(1, 19),
-(21, 13),
-(26, 12),
-(27, 14),
-(15, 16),
-(20, 7),
-(19, 3),
-(17, 12),
-(18, 14),
-(16, 2),
-(22, 19),
-(29, 10),
-(3, 8),
-(25, 19),
-(18, 5),
-(12, 15),
-(5, 4),
-(11, 6),
-(23, 14),
-(32, 6),
-(21, 14),
-(13, 5),
-(28, 1),
-(14, 4),
-(35, 11),
-(38, 15),
-(9, 19),
-(15, 2),
-(22, 6),
-(6, 1),
-(16, 13),
-(34, 4),
-(5, 11),
-(25, 13),
-(29, 19),
-(33, 3),
-(30, 7),
-(24, 19),
-(11, 20),
-(27, 15),
-(39, 2),
-(31, 16),
-(29, 9),
-(36, 1),
-(35, 17),
-(16, 16),
-(27, 9),
-(38, 18),
-(41, 4),
-(50, 13),
-(43, 7),
-(14, 19),
-(45, 9),
-(30, 3),
-(42, 15),
-(10, 5),
-(26, 2),
-(28, 15),
-(46, 14),
-(11, 7),
-(34, 1),
-(28, 6),
-(10, 8),
-(18, 19),
-(33, 6),
-(29, 12),
-(20, 16),
-(14, 2),
-(47, 5),
-(48, 11),
-(49, 15),
-(50, 2),
-(51, 12),
-(52, 16),
-(53, 4),
-(54, 8),
-(55, 13),
-(56, 6),
-(57, 10),
-(58, 18),
-(59, 1),
-(60, 17),
-(61, 7),
-(62, 20),
-(63, 3),
-(64, 9);
 
 ALTER TABLE public.room ADD FOREIGN KEY (resort_id) references resort(id);
 ALTER TABLE public.booking ADD FOREIGN KEY (room_id) references room(id);
 ALTER TABLE public.booking ADD FOREIGN KEY (customer_id) references customer(id);
-
-*/
-
-        ");
-        {
-        }
-        await cmd.ExecuteNonQueryAsync();
-    }
-}
