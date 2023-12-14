@@ -1,4 +1,5 @@
 ﻿using Npgsql;
+using System.ComponentModel.Design;
 
 
 namespace holidaymaker;
@@ -102,10 +103,9 @@ public class Booking(NpgsqlDataSource db)
                 Console.Clear();
                 Console.WriteLine("What would you like to edit?");
                 Console.WriteLine("1: Change room");
-                Console.WriteLine("2: Change customer");
-                Console.WriteLine("3: Change check in date");
-                Console.WriteLine("4: Change checkout date");
-                Console.WriteLine("0: EXIT");
+                Console.WriteLine("2: Change check in date");
+                Console.WriteLine("3: Change checkout date");
+                Console.WriteLine("0: Return to main menu");
 
                 switch (Console.ReadLine())
                 {
@@ -116,7 +116,15 @@ public class Booking(NpgsqlDataSource db)
                                          $"UPDATE public.booking SET room_id = $1 WHERE id = {bookingID}"))
                         {
                             Console.WriteLine("New room choice: ");
-                            cmd.Parameters.AddWithValue(Console.ReadLine());
+                            if (!int.TryParse(Console.ReadLine(), out int editRoom))
+                            {
+                                Console.Clear();
+                                Console.WriteLine("Wrong input, try again! Press any key to try again");
+                                Console.ReadKey();
+                                continue;
+                            }
+
+                            cmd.Parameters.AddWithValue(editRoom);
                             await cmd.ExecuteNonQueryAsync();
 
                             Console.Clear();
@@ -131,48 +139,48 @@ public class Booking(NpgsqlDataSource db)
                         Console.Clear();
 
                         await using (var cmd = db.CreateCommand(
-                                         $"UPDATE public.booking SET customer_id = $1 WHERE id = {bookingID}"))
-                        {
-                            Console.WriteLine("Change customer: ");
-                            int.TryParse(Console.ReadLine(), out int customerId);
-                            cmd.Parameters.AddWithValue(customerId);
-                            await cmd.ExecuteNonQueryAsync();
-                        }
-
-                        Console.Clear();
-                        Console.WriteLine("You have now changed the customer");
-                        Thread.Sleep(3000);
-                        Console.Clear();
-
-                        break;
-
-                    case "3":
-                        Console.Clear();
-
-                        await using (var cmd = db.CreateCommand(
                                          $"UPDATE public.booking SET in_date = $1 WHERE id = {bookingID}"))
                         {
                             Console.WriteLine("New Date (checkin): ");
-                            DateOnly.TryParse(Console.ReadLine(), out DateOnly dateIn);
+
+
+                            if (!DateOnly.TryParse(Console.ReadLine(), out DateOnly dateIn))
+                            {
+                                Console.Clear();
+                                Console.WriteLine("Wrong input, try again! Press any key to try again");
+                                Console.WriteLine("YYYY-MM-DD");
+                                Console.ReadKey();
+                                continue;
+                            }
+
                             cmd.Parameters.AddWithValue(dateIn);
                             await cmd.ExecuteNonQueryAsync();
+                            break;
+
                         }
 
-                        break;
 
-                    case "4":
+                    case "3":
                         Console.Clear();
 
                         await using (var cmd = db.CreateCommand(
                                          $"UPDATE public.booking SET out_date = $1 WHERE id = {bookingID}"))
                         {
                             Console.WriteLine("New Date (checkout): ");
-                            DateOnly.TryParse(Console.ReadLine(), out DateOnly dateOut);
+                            if (!DateOnly.TryParse(Console.ReadLine(), out DateOnly dateOut))
+                            {
+                                Console.Clear();
+                                Console.WriteLine("Wrong input, try again! Press any key to try again");
+                                Console.WriteLine("YYYY-MM-DD");
+                                Console.ReadKey();
+                                continue;
+                            }
+
                             cmd.Parameters.AddWithValue(dateOut);
                             await cmd.ExecuteNonQueryAsync();
+                            break;
                         }
 
-                        break;
 
 
                     case "0":
@@ -185,7 +193,6 @@ public class Booking(NpgsqlDataSource db)
                         Console.WriteLine("Invalid option");
                         Console.WriteLine("Press any key to return to menu");
                         Console.ReadKey();
-                        //menu = true;
                         Console.Clear();
                         continue;
                         throw new Exception("CRASH!");
