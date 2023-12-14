@@ -1,4 +1,5 @@
 ﻿using Npgsql;
+using System.Transactions;
 
 
 namespace holidaymaker;
@@ -9,14 +10,15 @@ public class Booking(NpgsqlDataSource db)
     {
         bool resort = true;
         bool room = false;
-        bool customer = false;
+        bool customer = true;
         bool datefirst = false;
         bool dateSecond = false;
         Console.Clear();
         while (true)
         {
+
             await using (var cmd = db.CreateCommand(
-                             "INSERT INTO booking (resort_id, room_id, in_date, out_date) VALUES ($1, $2, $3, $4)"))
+                            "INSERT INTO booking (resort_id, room_id, in_date, out_date) VALUES ($1, $2, $3, $4) RETURNING id"))
             {
                 if (resort)
                 {
@@ -45,7 +47,7 @@ public class Booking(NpgsqlDataSource db)
                     }
                     cmd.Parameters.AddWithValue(room_id);
                     room = false;
-                    customer = true;
+                    datefirst = true;
                     Console.Clear();
                 }
 
@@ -79,13 +81,104 @@ public class Booking(NpgsqlDataSource db)
 
                     cmd.Parameters.AddWithValue(out_date);
                     Console.Clear();
-                    Console.Write("well done, mission accomplished! ");
-                    Console.ReadKey();
+                }
+                int? lastInsertedId = (int?)await cmd.ExecuteScalarAsync();
+                Console.WriteLine(lastInsertedId + "<--- This is the last ID");
+                Console.ReadKey();
+
+            }
+
+            //ADD LAST INSERTEDID INTO EACH CUSTOMER IN JUNK TABLE
+
+
+            int totalCustomers = 0;
+            if (customer)
+            {
+                await Console.Out.WriteLineAsync("How many customers?");
+                if (!int.TryParse(Console.ReadLine(), out int customerCount))
+                {
+                    Console.Clear();
+                    Console.WriteLine("Wrong input");
+                    continue;
                 }
 
-                await cmd.ExecuteNonQueryAsync();
-                break;
+                totalCustomers = customerCount;
+                if (totalCustomers > 0)
+                {
+                    customer = false;
+
+                }
+                else
+                {
+                    Console.Clear();
+                    Console.WriteLine("Needs atleast one customer");
+                    continue;
+                }
             }
+
+
+            int count = 1;
+            for (int i = 0; i < totalCustomers; i++)
+            {
+
+                await using (var cmd = db.CreateCommand($"INSERT INTO customer (firstname, lastname, email, phone, date_of_birth) VALUES ($1, $2, $3, $4, $5)"))
+                {
+                    string firstname = string.Empty;
+                    string lastname = string.Empty;
+                    string email = string.Empty;
+                    string phone = string.Empty;
+
+
+                    Console.Write("Customer " + count + ". Enter firstname: ");
+                    cmd.Parameters.AddWithValue(firstname = Console.ReadLine());
+                    Console.Clear();
+
+                    Console.WriteLine("Name: " + firstname);
+
+                    Console.Write("Customer " + count + ". Enter lastname: ");
+                    cmd.Parameters.AddWithValue(lastname = Console.ReadLine());
+                    Console.Clear();
+                    Console.WriteLine("Name: " + firstname + " " + lastname);
+
+                    Console.Write("Customer " + count + ". Email: ");
+                    cmd.Parameters.AddWithValue(email = Console.ReadLine());
+                    Console.Clear();
+                    Console.WriteLine("Name: " + firstname + " " + lastname + " Email: " + email);
+
+                    Console.Write("Customer " + count + ". Phone: ");
+                    cmd.Parameters.AddWithValue(phone = Console.ReadLine());
+                    Console.Clear();
+                    Console.WriteLine("Name: " + firstname + " " + lastname + " Email: " + email + " Phone: " + phone);
+                    bool dob = true;
+                    while (dob)
+                    {
+
+                        Console.Write("Customer " + count + ". Date of Birth: ");
+                        if (!DateOnly.TryParse(Console.ReadLine(), out DateOnly DoB))
+                        {
+                            await Console.Out.WriteLineAsync("Wrong date format YYYY-MM-DD.");
+                            continue;
+                        }
+                        dob = false;
+                        cmd.Parameters.AddWithValue(DoB);
+                        Console.WriteLine();
+                    }
+
+                    count++;
+                    await cmd.ExecuteNonQueryAsync();
+                }
+            }
+
+            await Console.Out.WriteLineAsync("Bra jobbat!!!!");
+            Console.ReadKey();
+
+
+
+
+
+
+            break;
+
         }
     }
 
