@@ -48,10 +48,10 @@ public class SetupDB()
 
 	CREATE TABLE IF NOT EXISTS booking(
 	id SERIAL PRIMARY KEY,
-	resort_id INT NOT NULL,
-	room_id INT NOT NULL,
-	in_date DATE NOT NULL,
-	out_date DATE NOT NULL
+	resort_id INT,
+	room_id INT,
+	in_date DATE,
+	out_date DATE
 	);
 
 
