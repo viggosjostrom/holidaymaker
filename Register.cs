@@ -10,12 +10,6 @@ namespace holidaymaker;
 public class Register(NpgsqlDataSource db)
 {
 
-    public string? firstName = string.Empty;
-    public string? lastName = string.Empty;
-    public string? email = string.Empty;
-    public string? phone = string.Empty;
-    public string? dateOfBirth = string.Empty;
-
     public async Task Customer()
 
     {
