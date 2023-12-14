@@ -1,5 +1,7 @@
 ﻿using Npgsql;
 using System.ComponentModel.Design;
+using System.Data.SqlTypes;
+using System.Runtime.InteropServices;
 using System.Transactions;
 
 
@@ -15,7 +17,8 @@ public class Booking(NpgsqlDataSource db)
         bool datefirst = false;
         bool dateSecond = false;
         Console.Clear();
-        while (true)
+        bool newbooking = true;
+        while (newbooking)
         {
 
             await using (var cmd = db.CreateCommand(
@@ -83,102 +86,100 @@ public class Booking(NpgsqlDataSource db)
                     cmd.Parameters.AddWithValue(out_date);
                     Console.Clear();
                 }
-                int? lastInsertedId = (int?)await cmd.ExecuteScalarAsync();
-                Console.WriteLine(lastInsertedId + "<--- This is the last ID");
+
+                //IF IN AND OUTDATE IS NOT VIABLE THEN LOOP DATES.
+                int? lastBookingId = (int?)await cmd.ExecuteScalarAsync();
+
+
+                int totalCustomers = 0;
+                if (customer)
+                {
+                    await Console.Out.WriteLineAsync("How many customers?");
+                    if (!int.TryParse(Console.ReadLine(), out int customerCount))
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Wrong input");
+                        continue;
+                    }
+                    //LÄGG TILL FUNKTION OM 0 CUSTOMERS
+                    totalCustomers = customerCount;
+                    if (totalCustomers > 0)
+                    {
+                        customer = false;
+
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Needs atleast one customer");
+                        continue;
+                    }
+                }
+
+
+                int count = 1;
+                for (int i = 0; i < totalCustomers; i++)
+                {
+
+                    await using (var command = db.CreateCommand($"INSERT INTO customer (firstname, lastname, email, phone, date_of_birth) VALUES ($1, $2, $3, $4, $5) RETURNING id"))
+                    {
+                        string? firstname = string.Empty;
+                        string lastname = string.Empty;
+                        string email = string.Empty;
+                        string phone = string.Empty;
+
+
+                        Console.Write("Customer " + count + ". Enter firstname: ");
+                        command.Parameters.AddWithValue(firstname = Console.ReadLine());
+                        Console.Clear();
+
+
+                        Console.WriteLine("Name: " + firstname);
+
+                        Console.Write("Customer " + count + ". Enter lastname: ");
+                        command.Parameters.AddWithValue(lastname = Console.ReadLine());
+                        Console.Clear();
+                        Console.WriteLine("Name: " + firstname + " " + lastname);
+
+                        Console.Write("Customer " + count + ". Email: ");
+                        command.Parameters.AddWithValue(email = Console.ReadLine());
+                        Console.Clear();
+                        Console.WriteLine("Name: " + firstname + " " + lastname + " Email: " + email);
+
+                        Console.Write("Customer " + count + ". Phone: ");
+                        command.Parameters.AddWithValue(phone = Console.ReadLine());
+                        Console.Clear();
+                        Console.WriteLine("Name: " + firstname + " " + lastname + " Email: " + email + " Phone: " + phone);
+                        bool dob = true;
+                        while (dob)
+                        {
+
+                            Console.Write("Customer " + count + ". Date of Birth: ");
+                            if (!DateOnly.TryParse(Console.ReadLine(), out DateOnly DoB))
+                            {
+                                await Console.Out.WriteLineAsync("Wrong date format YYYY-MM-DD.");
+                                continue;
+                            }
+                            dob = false;
+                            command.Parameters.AddWithValue(DoB);
+                            Console.WriteLine();
+                        }
+
+                        int? newCustomerId = (int?)await command.ExecuteScalarAsync();
+
+                        await using (var comm = db.CreateCommand($"INSERT INTO customer_x_booking (booking_id, customer_id) VALUES ({lastBookingId}, {newCustomerId})"))
+                        {
+                            await comm.ExecuteNonQueryAsync();
+                        }
+                        count++;
+                    }
+                }
+                newbooking = false;
+                await Console.Out.WriteLineAsync("Bra jobbat!!!!");
                 Console.ReadKey();
 
+                break;
             }
-
-
-
-
-            int totalCustomers = 0;
-            if (customer)
-            {
-                await Console.Out.WriteLineAsync("How many customers?");
-                if (!int.TryParse(Console.ReadLine(), out int customerCount))
-                {
-                    Console.Clear();
-                    Console.WriteLine("Wrong input");
-                    continue;
-                }
-
-                totalCustomers = customerCount;
-                if (totalCustomers > 0)
-                {
-                    customer = false;
-
-                }
-                else
-                {
-                    Console.Clear();
-                    Console.WriteLine("Needs atleast one customer");
-                    continue;
-                }
-            }
-
-
-            int count = 1;
-            for (int i = 0; i < totalCustomers; i++)
-            {
-
-                await using (var cmd = db.CreateCommand($"INSERT INTO customer (firstname, lastname, email, phone, date_of_birth) VALUES ($1, $2, $3, $4, $5)"))
-                {
-                    string firstname = string.Empty;
-                    string lastname = string.Empty;
-                    string email = string.Empty;
-                    string phone = string.Empty;
-
-
-                    Console.Write("Customer " + count + ". Enter firstname: ");
-                    cmd.Parameters.AddWithValue(firstname = Console.ReadLine());
-                    Console.Clear();
-
-                    Console.WriteLine("Name: " + firstname);
-
-                    Console.Write("Customer " + count + ". Enter lastname: ");
-                    cmd.Parameters.AddWithValue(lastname = Console.ReadLine());
-                    Console.Clear();
-                    Console.WriteLine("Name: " + firstname + " " + lastname);
-
-                    Console.Write("Customer " + count + ". Email: ");
-                    cmd.Parameters.AddWithValue(email = Console.ReadLine());
-                    Console.Clear();
-                    Console.WriteLine("Name: " + firstname + " " + lastname + " Email: " + email);
-
-                    Console.Write("Customer " + count + ". Phone: ");
-                    cmd.Parameters.AddWithValue(phone = Console.ReadLine());
-                    Console.Clear();
-                    Console.WriteLine("Name: " + firstname + " " + lastname + " Email: " + email + " Phone: " + phone);
-                    bool dob = true;
-                    while (dob)
-                    {
-
-                        Console.Write("Customer " + count + ". Date of Birth: ");
-                        if (!DateOnly.TryParse(Console.ReadLine(), out DateOnly DoB))
-                        {
-                            await Console.Out.WriteLineAsync("Wrong date format YYYY-MM-DD.");
-                            continue;
-                        }
-                        dob = false;
-                        cmd.Parameters.AddWithValue(DoB);
-                        Console.WriteLine();
-                    }
-
-                    count++;
-                    await cmd.ExecuteNonQueryAsync();
-                }
-            }
-
-            await Console.Out.WriteLineAsync("Bra jobbat!!!!");
-            Console.ReadKey();
-
-
-
-
-
-
-            break;
 
         }
     }
@@ -306,10 +307,12 @@ public class Booking(NpgsqlDataSource db)
         Console.WriteLine("Which booking would you like to delete? (Enter the bookingID)");
         if (int.TryParse(Console.ReadLine(), out int bookingID)) // Lade till en if till tryparse
         {
+#pragma warning disable IDE0063 // Use simple 'using' statement
             await using (var cmd = db.CreateCommand($"DELETE FROM booking WHERE booking.id = {bookingID}"))
             {
                 await cmd.ExecuteNonQueryAsync();
             }
+#pragma warning restore IDE0063 // Use simple 'using' statement
         }
         else // Lade till en else till tryparse
         {
@@ -410,5 +413,6 @@ public class Booking(NpgsqlDataSource db)
 
             return result;
         }
+
     }
 }
