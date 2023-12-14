@@ -22,49 +22,48 @@ public class SetupDB()
 
 	CREATE TABLE IF NOT EXISTS resort(
 	id SERIAL PRIMARY KEY,
-	name TEXT,
-	city TEXT,
-	dist_beach INT,
-	dist_centrum INT,
-	stars INT
+	name TEXT NOT NULL,
+	city TEXT NOT NULL,
+	dist_beach INT NOT NULL,
+	dist_centrum INT NOT NULL,
+	stars INT NOT NULL
 	);
 
 	CREATE TABLE IF NOT EXISTS customer(
 	id SERIAL PRIMARY KEY,
-	firstname TEXT,
-	lastname TEXT,
-	email TEXT,
-	phone TEXT,
-	date_of_birth DATE
+	firstname TEXT NOT NULL,
+	lastname TEXT NOT NULL,
+	email TEXT NOT NULL,
+	phone TEXT NOT NULL,
+	date_of_birth DATE NOT NULL
 	);
 
 	CREATE TABLE IF NOT EXISTS room(
 	id SERIAL PRIMARY KEY,
 	name TEXT NOT NULL,
-	resort_id INT,
-	sqm INT,
-	price MONEY
+	resort_id INT NOT NULL,
+	sqm INT NOT NULL,
+	price MONEY NOT NULL
 	);
 
 	CREATE TABLE IF NOT EXISTS booking(
 	id SERIAL PRIMARY KEY,
-	resort_id INT,
-	room_id INT,
-	customer_id INT,
-	in_date DATE,
-	out_date DATE
+	resort_id INT NOT NULL,
+	room_id INT NOT NULL,
+	in_date DATE NOT NULL,
+	out_date DATE NOT NULL
 	);
 
 
 	CREATE TABLE IF NOT EXISTS amenities(
 	id SERIAL PRIMARY KEY,
-	name TEXT
+	name TEXT NOT NULL
 	);
 
 	CREATE TABLE IF NOT EXISTS extras(
 	id SERIAL PRIMARY KEY,	
-	name TEXT,
-	price MONEY		
+	name TEXT NOT NULL,
+	price MONEY NOT NULL
 	);
 
 	CREATE TABLE IF NOT EXISTS resort_x_amenities(
