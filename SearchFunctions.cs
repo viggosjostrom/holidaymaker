@@ -14,6 +14,9 @@ public class SearchFunctions(NpgsqlDataSource db)
 
         while (true)
         {
+            int xdist_beach = 1000000;
+            int xdist_centrum = 1000000;
+            int sqmInt = 0;
 
             {
                 Console.WriteLine("SEARCH BOOKING");
@@ -51,9 +54,10 @@ public class SearchFunctions(NpgsqlDataSource db)
                     Console.WriteLine("SEARCH BOOKING");
                     Console.WriteLine($"Choosen check in date: {in_date}");
                     Console.WriteLine($"Choosen check out date: {out_date}");
+                    Console.WriteLine("");
                     Console.WriteLine("Enter desired MAX distance to beach in meters: ");
-                    string input = Console.ReadLine();
-                    if (Int32.TryParse(input, out int dist_beach))
+                    string inputBeach = Console.ReadLine();
+                    if (Int32.TryParse(inputBeach, out xdist_beach))
                     {
 
                     }
@@ -63,16 +67,74 @@ public class SearchFunctions(NpgsqlDataSource db)
                         Console.WriteLine("Wrong input, try again! ");
                         continue;
                     }
-
-
-
-
                 }
                 else
                 {
                     Console.Clear();
                     Console.WriteLine("No preferences for distance to beach added");
                 }
+
+
+                Console.Clear();
+                Console.WriteLine("SEARCH BOOKING");
+                Console.WriteLine($"Choosen check in date: {in_date}");
+                Console.WriteLine($"Choosen check out date: {out_date}");
+                Console.WriteLine($"Choosen MAX distance to beach: {xdist_beach}");
+                Console.WriteLine("");
+                Console.WriteLine("Add distance to beach preference? y/n");
+                string centrumPreference = string.Empty;
+                centrumPreference = Console.ReadLine();
+                if (centrumPreference == "y")
+                {
+                    Console.Clear();
+                    Console.WriteLine("SEARCH BOOKING");
+                    Console.WriteLine($"Choosen check in date: {in_date}");
+                    Console.WriteLine($"Choosen check out date: {out_date}");
+                    Console.WriteLine($"Choosen MAX distance to beach: {xdist_beach}");
+                    Console.WriteLine("");
+                    Console.WriteLine("Enter desired MAX distance to centrum in meters: ");
+                    string inputCentrum = Console.ReadLine();
+                    if (Int32.TryParse(inputCentrum, out xdist_centrum))
+                    {
+
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Wrong input, try again! ");
+                        continue;
+                    }
+                }
+
+                Console.Clear();
+                Console.WriteLine("SEARCH BOOKING");
+                Console.WriteLine($"Choosen check in date: {in_date}");
+                Console.WriteLine($"Choosen check out date: {out_date}");
+                Console.WriteLine($"Choosen MAX distance to beach: {xdist_beach}");
+                Console.WriteLine($"Choosen MAX distance to beach: {xdist_centrum}");
+                Console.WriteLine("");
+                Console.WriteLine("Choose minimun desired room-size (enter '0' if no preference): ");
+                string inputSqm = Console.ReadLine();
+                if (Int32.TryParse(inputSqm, out sqmInt))
+                {
+
+                }
+                else
+                {
+                    Console.Clear();
+                    Console.WriteLine("Wrong input, try again! ");
+                    continue;
+                }
+
+                Console.Clear();
+                Console.WriteLine("SEARCH INPUTS");
+                Console.WriteLine($"Choosen check in date: {in_date}");
+                Console.WriteLine($"Choosen check out date: {out_date}");
+                Console.WriteLine($"Choosen MAX distance to beach: {xdist_beach}");
+                Console.WriteLine($"Choosen MAX distance to beach: {xdist_centrum}");
+                Console.WriteLine($"Chosen MIN size on room {sqmInt} m2");
+
+
 
 
                 await using (var cmd = db.CreateCommand($@"SELECT
@@ -101,8 +163,8 @@ WHERE
                 OR (b.in_date BETWEEN '{in_date}' AND '{out_date}')
             )
     )
-    AND rs.dist_beach <=200  -- Replace with the max distance to the beach
-    AND rs.dist_centrum <=1500  -- Replace with the max distance to the centrum
+    AND rs.dist_beach <={xdist_beach}  -- Replace with the max distance to the beach
+    AND rs.dist_centrum <={xdist_centrum}  -- Replace with the max distance to the centrum
     AND EXISTS (
         SELECT
             1
@@ -112,17 +174,17 @@ WHERE
             amenities a ON ra.amenities_id = a.id
         WHERE
             ra.resort_id = rs.id
-            AND LOWER(a.name) LIKE ALL (ARRAY['%%', '%%']) -- Replace with the desired amenities
+            AND LOWER(a.name) LIKE ALL (ARRAY['%%', '%%', '%%']) -- Replace with the desired amenities
     )
-    AND r.sqm >= 10; -- Replace with the minimum room size
+    AND r.sqm >= {sqmInt}; -- Replace with the minimum room size
 "))
                 {
                     await using (var reader = await cmd.ExecuteReaderAsync())
                     {
                         Console.WriteLine("SEARCH RESULT:");
-                        Console.WriteLine("---------------------------------------------------------------------------------------------------------");
-                        Console.WriteLine("Room ID\t| Room Name\t| SQM\t| Price\t| Resort Name\t| City\t| Dist to Beach\t| Dist to Centrum");
-                        Console.WriteLine("---------------------------------------------------------------------------------------------------------");
+                        Console.WriteLine("---------------------------------------------------------------------------------------------------------------------------");
+                        Console.WriteLine("Room ID\t| Room Name\t| SQM\t| Price\t| Resort Name\t| City\t\t| Distance to Beach\t\t| Distance to Centrum");
+                        Console.WriteLine("---------------------------------------------------------------------------------------------------------------------------");
 
                         while (await reader.ReadAsync())
                         {
@@ -136,11 +198,10 @@ WHERE
                              reader.GetInt32(6),
                              reader.GetInt32(7)
    );
-
-                            Console.WriteLine($"{roomId + "\t"} | {roomName + "\t"} | {sqm + "\t"} | {price + "\t"} | {resortName + "\t"} | {city + "\t\t"} | {distToBeach + "\t"} | {distToCentrum}");
+                            Console.WriteLine($"{roomId + "\t"}| {roomName + "\t"}| {sqm + "\t"}| {price + "\t"}| {resortName + "\t"}| {city + "\t\t"}| {distToBeach + "\t\t"}| {distToCentrum}");
                         }
 
-                        Console.WriteLine("----------------------------------------------------------------------------------------------------------");
+                        Console.WriteLine("-----------------------------------------------------------------------------------------------------------------------------");
                     }
                 }
 
