@@ -125,6 +125,20 @@ public class SearchFunctions(NpgsqlDataSource db)
                     Console.WriteLine("Wrong input, try again! ");
                     continue;
                 }
+               
+                Console.Clear();
+                Console.WriteLine("SEARCH INPUTS");
+                Console.WriteLine($"Choosen check in date: {in_date}");
+                Console.WriteLine($"Choosen check out date: {out_date}");
+                Console.WriteLine($"Choosen MAX distance to beach: {xdist_beach}");
+                Console.WriteLine($"Choosen MAX distance to beach: {xdist_centrum}");
+                Console.WriteLine($"Chosen MIN size on room {sqmInt} m2");
+                Console.WriteLine("");
+                Console.WriteLine("Choose desired amenities. Enter keywords eg. 'pool'. Hit 'Enter' to skip");
+                string amenitiesInput1 = Console.ReadLine();
+                Console.Clear();
+                Console.WriteLine("Second desired amenity: ");
+                string amenitiesInput2 = Console.ReadLine();
 
                 Console.Clear();
                 Console.WriteLine("SEARCH INPUTS");
@@ -133,6 +147,7 @@ public class SearchFunctions(NpgsqlDataSource db)
                 Console.WriteLine($"Choosen MAX distance to beach: {xdist_beach}");
                 Console.WriteLine($"Choosen MAX distance to beach: {xdist_centrum}");
                 Console.WriteLine($"Chosen MIN size on room {sqmInt} m2");
+                Console.WriteLine($"Choosen amenities: {amenitiesInput1.Replace(" ",", ")}");
 
 
 
@@ -174,7 +189,7 @@ WHERE
             amenities a ON ra.amenities_id = a.id
         WHERE
             ra.resort_id = rs.id
-            AND LOWER(a.name) LIKE ALL (ARRAY['%%', '%%', '%%']) -- Replace with the desired amenities
+            AND LOWER(a.name) LIKE ALL (ARRAY['%{amenitiesInput1}%', '%{amenitiesInput2}%']) -- Replace with the desired amenities
     )
     AND r.sqm >= {sqmInt}; -- Replace with the minimum room size
 "))
@@ -183,7 +198,7 @@ WHERE
                     {
                         Console.WriteLine("SEARCH RESULT:");
                         Console.WriteLine("---------------------------------------------------------------------------------------------------------------------------");
-                        Console.WriteLine("Room ID\t| Room Name\t| SQM\t| Price\t| Resort Name\t| City\t\t| Distance to Beach\t\t| Distance to Centrum");
+                        Console.WriteLine("Room ID\t| Room Name\t| SQM\t| Price\t\t| Resort Name\t\t| City\t\t| Dist Beach\t| Dist Centrum");
                         Console.WriteLine("---------------------------------------------------------------------------------------------------------------------------");
 
                         while (await reader.ReadAsync())
@@ -198,7 +213,7 @@ WHERE
                              reader.GetInt32(6),
                              reader.GetInt32(7)
    );
-                            Console.WriteLine($"{roomId + "\t"}| {roomName + "\t"}| {sqm + "\t"}| {price + "\t"}| {resortName + "\t"}| {city + "\t\t"}| {distToBeach + "\t\t"}| {distToCentrum}");
+                            Console.WriteLine($"{roomId + "\t"}| {roomName + "\t"}| {sqm + "\t\t"}| {price + "\t"}| {resortName + "\t\t"}| {city + "\t\t\t"}| {distToBeach + "\t\t"}| {distToCentrum}");
                         }
 
                         Console.WriteLine("-----------------------------------------------------------------------------------------------------------------------------");
