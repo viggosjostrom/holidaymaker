@@ -91,7 +91,7 @@ public class SetupDB()
 	customer_id SERIAL REFERENCES customer(id)
 	);
 
-/*
+
 INSERT INTO public.amenities(
 name)
 	VALUES
@@ -421,7 +421,7 @@ ALTER TABLE public.room ADD FOREIGN KEY (resort_id) references resort(id);
 ALTER TABLE public.booking ADD FOREIGN KEY (room_id) references room(id);
 ALTER TABLE public.booking ADD FOREIGN KEY (customer_id) references customer(id);
 
-*/
+
 
         ");
         {

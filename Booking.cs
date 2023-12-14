@@ -88,7 +88,7 @@ public class Booking(NpgsqlDataSource db)
 
             }
 
-            //ADD LAST INSERTEDID INTO EACH CUSTOMER IN JUNK TABLE
+
 
 
             int totalCustomers = 0;
