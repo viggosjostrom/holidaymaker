@@ -322,7 +322,7 @@ public class Booking(NpgsqlDataSource db)
                             case "1":// får inte till rätt query för att kolla om den redan finns eller inte?
                             /*
                             await using (var cmd = db.CreateCommand(
-                                     $"UPDATE public.booking_x_extras SET extras_id = $1 WHERE booking_id = {bookingID}"))
+                                     $"INSERT public.booking_x_extras SET extras_id = $1 WHERE booking_id = {bookingID}"))
 
                             {
                                 Console.WriteLine("New extras choice (ID): ");
@@ -351,15 +351,12 @@ public class Booking(NpgsqlDataSource db)
                                 Console.WriteLine("Which extra would you like to delete? (Enter the extrasID)");
                                 if (int.TryParse(Console.ReadLine(), out int extrasID))
                                 {
-
                                     await using (var cmd = db.CreateCommand(@$"
                                     DELETE FROM public.booking_x_extras 
                                     WHERE booking_x_extras.extras_id = {extrasID} AND booking_id = {bookingID};"))
                                     {
                                         await cmd.ExecuteNonQueryAsync();
                                     }
-
-
                                 }
                                 else
                                 {
