@@ -277,7 +277,7 @@ public class Booking(NpgsqlDataSource db)
                         }
 
 
-                    case "4":// både skriva ut vilka val som finns och vilka som man har just nu. Vad ska göras om två extras finns på samma bokning?
+                    case "4":
                         Console.Clear();
 
                         string extraName = string.Empty;
@@ -289,7 +289,7 @@ public class Booking(NpgsqlDataSource db)
                                         JOIN booking_x_extras ON extras.id = booking_x_extras.extras_id
                                         WHERE booking_id = {bookingID}
                                          ";
-
+                    
 
                         await using (var cmd = db.CreateCommand(qViewExtras))
                         await using (var reader = await cmd.ExecuteReaderAsync())
@@ -310,7 +310,7 @@ public class Booking(NpgsqlDataSource db)
 
 
 
-                        Console.WriteLine("1: Add extras");
+                        Console.WriteLine("1: Add extras"); // Ska in gå att lägga till om redan finns! Hur göras om två "extras" finns på samma bokning?
                         Console.WriteLine("2: Delete extras");
                         Console.WriteLine("3: View avalible extras");
                         Console.WriteLine("0: Return to main menu");
@@ -320,32 +320,35 @@ public class Booking(NpgsqlDataSource db)
                         {
 
                             case "1":// får inte till rätt query för att kolla om den redan finns eller inte?
-                            /*
-                            await using (var cmd = db.CreateCommand(
-                                     $"INSERT public.booking_x_extras SET extras_id = $1 WHERE booking_id = {bookingID}"))
 
-                            {
-                                Console.WriteLine("New extras choice (ID): ");
-                                if (!int.TryParse(Console.ReadLine(), out int editExtras))
+
+
+                                Console.WriteLine("Which extra would you like to add? (Enter the extrasID)");
+                                if (int.TryParse(Console.ReadLine(), out int extrasIDs))
                                 {
+                                    await using (var cmd = db.CreateCommand(@$"
+                                    INSERT INTO public.booking_x_extras (booking_id, extras_id)
+                                    VALUES
+                                    ({bookingID},{extrasIDs});"))
+
+                                    {
+                                        await cmd.ExecuteNonQueryAsync();
+                                    }
+                                    Console.WriteLine($"Added extra with ID: {extrasIDs}");
+                                    Thread.Sleep(3000);
                                     Console.Clear();
-                                    Console.WriteLine("Wrong input, try again! Press any key to try again");
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Extras does not exist, try again");
+                                    Console.WriteLine("Press any key to return to menu");
                                     Console.ReadKey();
-                                    continue;
+                                    Console.Clear();
                                 }
 
-                                cmd.Parameters.AddWithValue(editExtras);
-                                await cmd.ExecuteNonQueryAsync();
-
-                                Console.Clear();
-                                Console.WriteLine("You have now edited the extras");
-                                Thread.Sleep(3000);
-                                Console.Clear();
-
-
                                 break;
-                            }
-                            */
+
+
                             case "2":
 
                                 Console.WriteLine("Which extra would you like to delete? (Enter the extrasID)");
@@ -357,6 +360,10 @@ public class Booking(NpgsqlDataSource db)
                                     {
                                         await cmd.ExecuteNonQueryAsync();
                                     }
+
+                                    Console.WriteLine($"Extra with ID: {extrasID}");
+                                    Thread.Sleep(3000);
+                                    Console.Clear();
                                 }
                                 else
                                 {
@@ -365,9 +372,6 @@ public class Booking(NpgsqlDataSource db)
                                     Console.ReadKey();
                                     Console.Clear();
                                 }
-
-
-
 
                                 break;
 
