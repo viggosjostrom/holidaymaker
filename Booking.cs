@@ -17,8 +17,7 @@ public class Booking(NpgsqlDataSource db)
         bool datefirst = false;
         bool dateSecond = false;
         Console.Clear();
-        bool newbooking = true;
-        while (newbooking)
+        while (true)
         {
 
             await using (var cmd = db.CreateCommand(
@@ -174,7 +173,6 @@ public class Booking(NpgsqlDataSource db)
                         count++;
                     }
                 }
-                newbooking = false;
                 await Console.Out.WriteLineAsync("Bra jobbat!!!!");
                 Console.ReadKey();
 
