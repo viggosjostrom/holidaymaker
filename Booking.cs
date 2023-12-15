@@ -280,6 +280,9 @@ public class Booking(NpgsqlDataSource db)
                     case "4":// både skriva ut vilka val som finns och vilka som man har just nu. Vad ska göras om två extras finns på samma bokning?
                         Console.Clear();
 
+                        string extraName = string.Empty;
+                        int extraID = 0;
+
                         string qViewExtras = @$"
                                         SELECT extras.name, booking_x_extras.booking_id, extras.id
                                         FROM extras
@@ -291,12 +294,15 @@ public class Booking(NpgsqlDataSource db)
                         await using (var cmd = db.CreateCommand(qViewExtras))
                         await using (var reader = await cmd.ExecuteReaderAsync())
                         {
-                            Console.WriteLine("Your extras: ");
+                            Console.WriteLine("Your current extras: ");
                             while (await reader.ReadAsync())
                             {
                                 Console.WriteLine("ID: " + reader.GetInt32(2));
                                 Console.WriteLine("Label: " + reader.GetString(0));
                                 Console.WriteLine();
+
+                                extraName = reader.GetString(0);
+                                extraID = reader.GetInt32(2);
                             }
                         }
 
@@ -306,20 +312,65 @@ public class Booking(NpgsqlDataSource db)
 
                         Console.WriteLine("1: Add extras");
                         Console.WriteLine("2: Delete extras");
-                        Console.WriteLine("3: View extras");
-                        Console.WriteLine("0: EXIT");
+                        Console.WriteLine("3: View avalible extras");
+                        Console.WriteLine("0: Return to main menu");
 
 
                         switch (Console.ReadLine())
                         {
 
-                            case "1":
+                            case "1":// får inte till rätt query för att kolla om den redan finns eller inte?
+                            /*
+                            await using (var cmd = db.CreateCommand(
+                                     $"UPDATE public.booking_x_extras SET extras_id = $1 WHERE booking_id = {bookingID}"))
 
+                            {
+                                Console.WriteLine("New extras choice (ID): ");
+                                if (!int.TryParse(Console.ReadLine(), out int editExtras))
+                                {
+                                    Console.Clear();
+                                    Console.WriteLine("Wrong input, try again! Press any key to try again");
+                                    Console.ReadKey();
+                                    continue;
+                                }
+
+                                cmd.Parameters.AddWithValue(editExtras);
+                                await cmd.ExecuteNonQueryAsync();
+
+                                Console.Clear();
+                                Console.WriteLine("You have now edited the extras");
+                                Thread.Sleep(3000);
+                                Console.Clear();
 
 
                                 break;
-
+                            }
+                            */
                             case "2":
+
+                                Console.WriteLine("Which extra would you like to delete? (Enter the extrasID)");
+                                if (int.TryParse(Console.ReadLine(), out int extrasID))
+                                {
+
+                                    await using (var cmd = db.CreateCommand(@$"
+                                    DELETE FROM public.booking_x_extras 
+                                    WHERE booking_x_extras.extras_id = {extrasID} AND booking_id = {bookingID};"))
+                                    {
+                                        await cmd.ExecuteNonQueryAsync();
+                                    }
+
+
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Extras does not exist, try again");
+                                    Console.WriteLine("Press any key to return to menu");
+                                    Console.ReadKey();
+                                    Console.Clear();
+                                }
+
+
+
 
                                 break;
 
@@ -346,6 +397,12 @@ public class Booking(NpgsqlDataSource db)
 
                                 break;
 
+                            case "0":
+                                Console.Clear();
+                                edit = false;
+                                break;
+
+
                             default:
 
                                 Console.WriteLine("Invalid option");
@@ -358,33 +415,7 @@ public class Booking(NpgsqlDataSource db)
 
 
 
-
-
-
-                        await using (var cmd = db.CreateCommand(
-                                         $"UPDATE public.booking_x_extras SET extras_id = $1 WHERE id = {bookingID}"))
-
-                        {
-                            Console.WriteLine("New extras choice: ");
-                            if (!int.TryParse(Console.ReadLine(), out int editExtras))
-                            {
-                                Console.Clear();
-                                Console.WriteLine("Wrong input, try again! Press any key to try again");
-                                Console.ReadKey();
-                                continue;
-                            }
-
-                            cmd.Parameters.AddWithValue(editExtras);
-                            await cmd.ExecuteNonQueryAsync();
-
-                            Console.Clear();
-                            Console.WriteLine("You have now edited the extras");
-                            Thread.Sleep(3000);
-                            Console.Clear();
-                        }
-
                         break;
-
 
 
 
