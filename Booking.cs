@@ -199,6 +199,7 @@ public class Booking(NpgsqlDataSource db)
                 Console.WriteLine("1: Change room");
                 Console.WriteLine("2: Change check in date");
                 Console.WriteLine("3: Change checkout date");
+                Console.WriteLine("4: Change extras");
                 Console.WriteLine("0: Return to main menu");
 
                 switch (Console.ReadLine())
@@ -276,6 +277,116 @@ public class Booking(NpgsqlDataSource db)
                         }
 
 
+                    case "4":// både skriva ut vilka val som finns och vilka som man har just nu. Vad ska göras om två extras finns på samma bokning?
+                        Console.Clear();
+
+                        string qViewExtras = @$"
+                                        SELECT extras.name, booking_x_extras.booking_id, extras.id
+                                        FROM extras
+                                        JOIN booking_x_extras ON extras.id = booking_x_extras.extras_id
+                                        WHERE booking_id = {bookingID}
+                                         ";
+
+
+                        await using (var cmd = db.CreateCommand(qViewExtras))
+                        await using (var reader = await cmd.ExecuteReaderAsync())
+                        {
+                            Console.WriteLine("Your extras: ");
+                            while (await reader.ReadAsync())
+                            {
+                                Console.WriteLine("ID: " + reader.GetInt32(2));
+                                Console.WriteLine("Label: " + reader.GetString(0));
+                                Console.WriteLine();
+                            }
+                        }
+
+                        Console.ReadKey();
+
+
+
+                        Console.WriteLine("1: Add extras");
+                        Console.WriteLine("2: Delete extras");
+                        Console.WriteLine("3: View extras");
+                        Console.WriteLine("0: EXIT");
+
+
+                        switch (Console.ReadLine())
+                        {
+
+                            case "1":
+
+
+
+                                break;
+
+                            case "2":
+
+                                break;
+
+                            case "3":
+
+                                string qAllViewExtras = @$"
+                                        SELECT extras.name, price, extras.id
+                                        FROM extras";
+
+                                await using (var cmd = db.CreateCommand(qAllViewExtras))
+                                await using (var reader = await cmd.ExecuteReaderAsync())
+                                {
+                                    Console.WriteLine("All extras: ");
+                                    while (await reader.ReadAsync())
+                                    {
+                                        Console.WriteLine("ID: " + reader.GetInt32(2));
+                                        Console.WriteLine("Label: " + reader.GetString(0));
+                                        Console.WriteLine("Price: " + reader.GetDecimal(1));
+                                        Console.WriteLine();
+                                    }
+                                }
+
+                                Console.ReadKey();
+
+                                break;
+
+                            default:
+
+                                Console.WriteLine("Invalid option");
+                                Console.WriteLine("Press any key to return to menu");
+                                Console.ReadKey();
+                                Console.Clear();
+                                continue;
+                                throw new Exception("CRASH!");
+                        }
+
+
+
+
+
+
+                        await using (var cmd = db.CreateCommand(
+                                         $"UPDATE public.booking_x_extras SET extras_id = $1 WHERE id = {bookingID}"))
+
+                        {
+                            Console.WriteLine("New extras choice: ");
+                            if (!int.TryParse(Console.ReadLine(), out int editExtras))
+                            {
+                                Console.Clear();
+                                Console.WriteLine("Wrong input, try again! Press any key to try again");
+                                Console.ReadKey();
+                                continue;
+                            }
+
+                            cmd.Parameters.AddWithValue(editExtras);
+                            await cmd.ExecuteNonQueryAsync();
+
+                            Console.Clear();
+                            Console.WriteLine("You have now edited the extras");
+                            Thread.Sleep(3000);
+                            Console.Clear();
+                        }
+
+                        break;
+
+
+
 
                     case "0":
                         Console.Clear();
@@ -307,12 +418,12 @@ public class Booking(NpgsqlDataSource db)
         Console.WriteLine("Which booking would you like to delete? (Enter the bookingID)");
         if (int.TryParse(Console.ReadLine(), out int bookingID)) // Lade till en if till tryparse
         {
-#pragma warning disable IDE0063 // Use simple 'using' statement
+
             await using (var cmd = db.CreateCommand($"DELETE FROM booking WHERE booking.id = {bookingID}"))
             {
                 await cmd.ExecuteNonQueryAsync();
             }
-#pragma warning restore IDE0063 // Use simple 'using' statement
+
         }
         else // Lade till en else till tryparse
         {
