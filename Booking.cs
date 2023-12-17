@@ -187,7 +187,7 @@ public class Booking(NpgsqlDataSource db)
     public async Task Edit()
     {
         Console.Clear();
-        Console.WriteLine("Please enter your bookingID: ");
+        Console.WriteLine("Please enter your bookingID: "); // Om inte bookningID finns?
         if (int.TryParse(Console.ReadLine(), out int bookingID))
         {
             bool edit = true;
@@ -306,7 +306,7 @@ public class Booking(NpgsqlDataSource db)
                             }
                         }
 
-                        Console.ReadKey();
+                        Console.ReadKey(); 
 
 
 
