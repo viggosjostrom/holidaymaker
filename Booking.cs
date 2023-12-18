@@ -32,7 +32,7 @@ public class Booking(NpgsqlDataSource db)
                         continue;
                     }
 
-                    cmd.Parameters.AddWithValue("$1", resort_id);
+                    cmd.Parameters.AddWithValue(resort_id);
                     resort = false;
                     room = true;
                     Console.Clear();
@@ -65,7 +65,7 @@ public class Booking(NpgsqlDataSource db)
                         continue;
                     }
 
-                    cmd.Parameters.AddWithValue("$3", in_date);
+                    cmd.Parameters.AddWithValue(in_date);
                     datefirst = false;
                     dateSecond = true;
                     Console.Clear();
@@ -81,13 +81,13 @@ public class Booking(NpgsqlDataSource db)
                         continue;
                     }
 
-                    cmd.Parameters.AddWithValue("$4", out_date);
+                    cmd.Parameters.AddWithValue(out_date);
                     Console.Clear();
                 }
 
                 //IF IN AND OUTDATE IS NOT VIABLE THEN LOOP DATES.
                 int? lastBookingId = (int?)await cmd.ExecuteScalarAsync();
-            
+
 
                 int totalCustomers = 0;
                 if (customer)
@@ -184,7 +184,7 @@ public class Booking(NpgsqlDataSource db)
                 string query = $"select customer_id from customer_x_booking where booking_id = {lastBookingId}";
                 var reader = await db.CreateCommand(query).ExecuteReaderAsync();
 
-                while (await reader.ReadAsync())
+                while (await reader.ReadAsync()) // Bokning och kund läggs till men programmet crashar efteråt här, vad gör den? 
                 {
                     Console.WriteLine(reader.GetInt32(1));
                     result += reader.GetInt32(1);
@@ -220,8 +220,7 @@ public class Booking(NpgsqlDataSource db)
                 Console.WriteLine("1: Change room");
                 Console.WriteLine("2: Change check in date");
                 Console.WriteLine("3: Change checkout date");
-                Console.WriteLine("4: Delete");
-                Console.WriteLine("5: Change extras");
+                Console.WriteLine("4: Change extras");
                 Console.WriteLine("0: Return to main menu");
 
                 switch (Console.ReadLine())
@@ -297,26 +296,8 @@ public class Booking(NpgsqlDataSource db)
                             break;
                         }
 
+                    
                     case "4":
-                        Console.Clear();
-                        Console.WriteLine("Confirm delete");
-
-                        string answer = Console.ReadLine();
-                        if (answer.ToLower() == "yes" || answer.ToLower() == "y")
-                        {
-                            await using (var cmd2 = db.CreateCommand($"DELETE FROM public.booking WHERE id = {bookingID}"))
-                            {
-                                await using (var cmd1 = db.CreateCommand($"DELETE FROM public.customer_x_booking WHERE booking_id = {bookingID}"))
-                                {
-                                    await cmd1.ExecuteNonQueryAsync();
-                                }
-                                await cmd2.ExecuteNonQueryAsync();
-                            }
-                        }
-                        break;
-
-
-                    case "5":
 
                         Console.Clear();
 
@@ -513,22 +494,49 @@ public class Booking(NpgsqlDataSource db)
 
     public async Task Delete()
     {
-        Console.WriteLine("Which booking would you like to delete? (Enter the bookingID)");
-        if (int.TryParse(Console.ReadLine(), out int bookingID)) // Lade till en if till tryparse
+        while (true)
         {
-
-            await using (var cmd = db.CreateCommand($"DELETE FROM booking WHERE booking.id = {bookingID}"))
-            {
-                await cmd.ExecuteNonQueryAsync();
-            }
-
-        }
-        else // Lade till en else till tryparse
-        {
-            Console.WriteLine("Booking does not exist, try again");
-            Console.WriteLine("Press any key to return to menu");
-            Console.ReadKey();
             Console.Clear();
+            Console.WriteLine("Which booking would you like to delete? (Enter the bookingID)");
+            if (int.TryParse(Console.ReadLine(), out int bookingID)) // Lade till en if till tryparse
+            {
+
+                Console.Clear();
+                Console.WriteLine("Confirm delete? yes/no: ");
+
+                string answer = Console.ReadLine();
+                if (answer.ToLower() == "yes" || answer.ToLower() == "y")
+                {
+                    await using (var cmd2 = db.CreateCommand($"DELETE FROM public.booking WHERE id = {bookingID}"))
+                    {
+                        await using (var cmd1 = db.CreateCommand($"DELETE FROM public.customer_x_booking WHERE booking_id = {bookingID}"))
+                        {
+                            await cmd1.ExecuteNonQueryAsync();
+                        }
+                        await cmd2.ExecuteNonQueryAsync();
+                    }
+                    Console.Clear();
+                    break;
+                }
+                else if (answer.ToLower() == "no" || answer.ToLower() == "n")
+                {
+                    Console.Clear();
+                    break;
+                }
+                else
+                {
+                    Console.Clear();
+                    Console.WriteLine("Wrong input!");
+                    break;
+                }
+            }
+            else // Lade till en else till tryparse
+            {
+                Console.WriteLine("Booking does not exist, try again");
+                Console.WriteLine("Press any key to return to menu");
+                Console.ReadKey();
+                Console.Clear();
+            }
         }
     }
 
