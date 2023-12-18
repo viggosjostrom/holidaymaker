@@ -175,8 +175,6 @@ public class Booking(NpgsqlDataSource db)
                     }
                 }
 
-                newbooking = false;
-
                 await Console.Out.WriteLineAsync("Bra jobbat!!!!");
                 Console.ReadKey();
 
