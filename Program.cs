@@ -44,16 +44,16 @@ while (true)
                 continue;
 
             case 5:
-
-                Console.Clear();
-                SearchFunctions q = new SearchFunctions(db);
-                await q.AvaliableRooms();
-
-                continue;
+               Console.Clear();
+               SearchFunctions q = new SearchFunctions(db);
+               await q.AvaliableRooms();
+               continue;
 
             case 0:
-                System.Environment.Exit(666);
                 Console.Clear();
+                Ending.Text();
+                Ending.PlayMelody();
+                System.Environment.Exit(666);
                 break;
 
             default:
