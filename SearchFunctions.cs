@@ -211,7 +211,7 @@ public class SearchFunctions(NpgsqlDataSource db)
 
                         await using (var cmd = db.CreateCommand($@"SELECT
         r.id AS room_id,
-        r.name AS room_name,
+        rs.id AS resort_id,
         r.sqm,
         r.price,
         rs.name AS resort_name,
@@ -260,15 +260,15 @@ public class SearchFunctions(NpgsqlDataSource db)
                             {
                                 Console.Clear();
                                 Console.WriteLine("SEARCH RESULT:");
-                                Console.WriteLine("------------------------------------------------------------------------------------------------------------------");
-                                Console.WriteLine("Room ID\t| Room Name\t| SQM\t| Price\t\t| Resort Name\t\t| Beach | Centrum | City\t | Stars ");
-                                Console.WriteLine("------------------------------------------------------------------------------------------------------------------");
+                                Console.WriteLine("--------------------------------------------------------------------------------------------------------------------------");
+                                Console.WriteLine("| Resort ID\t|Room ID\t| SQM\t| Price\t\t| Resort Name\t\t| Beach | Centrum | City\t | Stars |");
+                                Console.WriteLine("--------------------------------------------------------------------------------------------------------------------------");
 
                                 while (await reader.ReadAsync())
                                 {
-                                    (int roomId, string roomName, int sqm, decimal price, string resortName, int distToBeach, int distToCentrum, string city, int stars) = (
+                                    (int resortid, int roomId, int sqm, decimal price, string resortName, int distToBeach, int distToCentrum, string city, int stars) = (
+                                     reader.GetInt32(1),
                                      reader.GetInt32(0),
-                                     reader.GetString(1),
                                      reader.GetInt32(2),
                                      reader.GetDecimal(3),
                                      reader.GetString(4),
@@ -277,29 +277,29 @@ public class SearchFunctions(NpgsqlDataSource db)
                                      reader.GetString(5),
                                      reader.GetInt32(8)
                                     );
-                                    Console.Write($"{roomId + "\t"}| {roomName + "\t\t"}| {sqm + "\t"}| {price + "\t"}|");
-                                    if (resortName.Length > 13)
+                                    Console.Write($"| {resortid + "\t\t"}| {roomId + "\t\t"}| {sqm + "\t"}| {price + "\t"}|");
+                                    if (resortName.Length > 14)
                                     {
-                                        await Console.Out.WriteAsync($"{resortName + "\t\t"}| {distToBeach + "\t"}| {distToCentrum}\t |");
+                                        await Console.Out.WriteAsync($"{resortName +""}| {distToBeach + "\t"}| {distToCentrum}\t  |");
                                     }
                                     else
                                     {
-                                        await Console.Out.WriteAsync($"{resortName + "\t\t"}| {distToBeach + "\t"}| {distToCentrum}\t |");
+                                        await Console.Out.WriteAsync($"{resortName + "\t\t"}| {distToBeach + "\t"}| {distToCentrum}\t  |");
                                     }
 
                                     if (city.Length > 6)
                                     {
-                                        await Console.Out.WriteAsync($"{city}\t | {stars}\n");
+                                        await Console.Out.WriteAsync($" {city}\t | {stars}     |\n");
 
                                     }
                                     else
                                     {
-                                        await Console.Out.WriteAsync($"{city}\t\t | {stars}\n");
+                                        await Console.Out.WriteAsync($" {city}\t | {stars}     |\n");
                                     }
 
                                 }
+                                Console.WriteLine("--------------------------------------------------------------------------------------------------------------------------");
 
-                                Console.WriteLine("------------------------------------------------------------------------------------------------------------------");
 
                                 await Console.Out.WriteLineAsync();
                                 //add searchfilter here!!!

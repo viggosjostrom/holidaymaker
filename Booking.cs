@@ -19,185 +19,204 @@ public class Booking(NpgsqlDataSource db)
         Console.Clear();
         while (true)
         {
+
+
             await using (var cmd = db.CreateCommand(
                              "INSERT INTO booking (resort_id, room_id, in_date, out_date) VALUES ($1, $2, $3, $4) RETURNING id"))
             {
                 if (resort)
                 {
                     Console.Write("Enter resort id: ");
-                    if (!int.TryParse(Console.ReadLine(), out int resort_id))
+                    if (int.TryParse(Console.ReadLine(), out int resort_id))
                     {
-                        Console.Clear();
-                        Console.WriteLine("Wrong input, try again! ");
-                        continue;
-                    }
-
-                    cmd.Parameters.AddWithValue(resort_id);
-                    resort = false;
-                    room = true;
-                    Console.Clear();
-                }
-
-                if (room)
-                {
-                    Console.Write("Enter room id: ");
-                    if (!int.TryParse(Console.ReadLine(), out int room_id))
-                    {
-                        Console.Clear();
-                        Console.WriteLine("Wrong input, try again! ");
-                        continue;
-                    }
-
-                    cmd.Parameters.AddWithValue(room_id);
-                    room = false;
-                    datefirst = true;
-                    Console.Clear();
-                }
-
-
-                if (datefirst)
-                {
-                    Console.Write("Enter in date (YYYY-MM-DD): ");
-                    if (!DateOnly.TryParse(Console.ReadLine(), out DateOnly in_date))
-                    {
-                        Console.Clear();
-                        Console.WriteLine("Wrong input, try again! ");
-                        continue;
-                    }
-
-                    cmd.Parameters.AddWithValue(in_date);
-                    datefirst = false;
-                    dateSecond = true;
-                    Console.Clear();
-                }
-
-                if (dateSecond)
-                {
-                    Console.Write("Enter out date (YYYY-MM-DD): ");
-                    if (!DateOnly.TryParse(Console.ReadLine(), out DateOnly out_date))
-                    {
-                        Console.Clear();
-                        Console.WriteLine("Wrong input, try again! ");
-                        continue;
-                    }
-
-                    cmd.Parameters.AddWithValue(out_date);
-                    Console.Clear();
-                }
-
-                //IF IN AND OUTDATE IS NOT VIABLE THEN LOOP DATES.
-                int? lastBookingId = (int?)await cmd.ExecuteScalarAsync();
-
-
-                int totalCustomers = 0;
-                if (customer)
-                {
-                    await Console.Out.WriteLineAsync("How many customers?");
-                    if (!int.TryParse(Console.ReadLine(), out int customerCount))
-                    {
-                        Console.Clear();
-                        Console.WriteLine("Wrong input");
-                        continue;
-                    }
-
-                    //LÄGG TILL FUNKTION OM 0 CUSTOMERS
-                    totalCustomers = customerCount;
-                    if (totalCustomers > 0)
-                    {
-                        customer = false;
-                    }
-                    else
-                    {
-                        Console.Clear();
-                        Console.WriteLine("Needs atleast one customer");
-                        continue;
-                    }
-                }
-
-
-                int count = 1;
-                for (int i = 0; i < totalCustomers; i++)
-                {
-                    await using (var command =
-                                 db.CreateCommand($"INSERT INTO customer (firstname, lastname, email, phone, date_of_birth) VALUES ($1, $2, $3, $4, $5) RETURNING id"))
-                    {
-                        string? firstname = string.Empty;
-                        string lastname = string.Empty;
-                        string email = string.Empty;
-                        string phone = string.Empty;
-
-
-                        Console.Write("Customer " + count + ". Enter firstname: ");
-                        command.Parameters.AddWithValue(firstname = Console.ReadLine());
-                        Console.Clear();
-
-
-                        Console.WriteLine("Name: " + firstname);
-
-                        Console.Write("Customer " + count + ". Enter lastname: ");
-                        command.Parameters.AddWithValue(lastname = Console.ReadLine());
-                        Console.Clear();
-                        Console.WriteLine("Name: " + firstname + " " + lastname);
-
-                        Console.Write("Customer " + count + ". Email: ");
-                        command.Parameters.AddWithValue(email = Console.ReadLine());
-                        Console.Clear();
-                        Console.WriteLine("Name: " + firstname + " " + lastname + " Email: " + email);
-
-                        Console.Write("Customer " + count + ". Phone: ");
-                        command.Parameters.AddWithValue(phone = Console.ReadLine());
-                        Console.Clear();
-                        Console.WriteLine("Name: " + firstname + " " + lastname + " Email: " + email + " Phone: " +
-                                          phone);
-                        bool dob = true;
-                        while (dob)
+                        await using (var resortCheck = db.CreateCommand("SELECT COUNT(*) FROM public.resort WHERE id = $1"))
                         {
-                            Console.Write("Customer " + count + ". Date of Birth: ");
-                            if (!DateOnly.TryParse(Console.ReadLine(), out DateOnly DoB))
+                            resortCheck.Parameters.AddWithValue(resort_id);
+                            long numberCheck = (long)await resortCheck.ExecuteScalarAsync();
+
+                            if (numberCheck > 0)
                             {
-                                await Console.Out.WriteLineAsync("Wrong date format YYYY-MM-DD.");
+                                cmd.Parameters.AddWithValue(resort_id);
+                                resort = false;
+                                room = true;
+                                Console.Clear();
+                            }
+                            else
+                            {
+                                Console.WriteLine("Sorry, resort id does not exist.");
                                 continue;
                             }
 
-                            dob = false;
-                            command.Parameters.AddWithValue(DoB);
-                            Console.WriteLine();
                         }
 
-                        int? newCustomerId = (int?)await command.ExecuteScalarAsync();
 
-                        await using (var comm = db.CreateCommand($"INSERT INTO customer_x_booking (booking_id, customer_id) VALUES ({lastBookingId}, {newCustomerId})"))
-                        {
-                            await comm.ExecuteNonQueryAsync();
-                        }
 
-                        count++;
+
                     }
+                    else
+                    {
+                        Console.WriteLine("Couldn't parse resort id");
+                        continue;
+                    }
+
+                    if (room)
+                    {
+                        Console.Write("Enter room id: ");
+                        if (int.TryParse(Console.ReadLine(), out int room_id))
+                        {
+                            await using (var roomCheck = db.CreateCommand("SELECT COUNT(*) FROM public.room WHERE id = $1"))
+                            {
+                                roomCheck.Parameters.AddWithValue(room_id);
+                                long numberCheck = (long)await roomCheck.ExecuteScalarAsync();
+
+                                if (numberCheck > 0)
+                                {
+                                    room = false;
+                                    datefirst = true;
+                                    Console.Clear();
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Sorry, room id does not exist.");
+                                    continue;
+                                }
+
+                            }
+                        }
+
+                        else
+                        {
+                            Console.WriteLine("Not able to parse!");
+                            continue;
+                        }
+                    }
+
+
+                    if (datefirst)
+                    {
+                        Console.Write("Enter in date (YYYY-MM-DD): ");
+                        if (!DateOnly.TryParse(Console.ReadLine(), out DateOnly in_date))
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Wrong input, try again! ");
+                            continue;
+                        }
+
+                        cmd.Parameters.AddWithValue(in_date);
+                        datefirst = false;
+                        dateSecond = true;
+                        Console.Clear();
+                    }
+
+                    if (dateSecond)
+                    {
+                        Console.Write("Enter out date (YYYY-MM-DD): ");
+                        if (!DateOnly.TryParse(Console.ReadLine(), out DateOnly out_date))
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Wrong input, try again! ");
+                            continue;
+                        }
+
+                        cmd.Parameters.AddWithValue(out_date);
+                        Console.Clear();
+                    }
+
+                    //IF IN AND OUTDATE IS NOT VIABLE THEN LOOP DATES.
+                    int? lastBookingId = (int?)await cmd.ExecuteScalarAsync();
+
+
+                    int totalCustomers = 0;
+                    if (customer)
+                    {
+                        await Console.Out.WriteLineAsync("How many customers?");
+                        if (!int.TryParse(Console.ReadLine(), out int customerCount))
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Wrong input");
+                            continue;
+                        }
+
+                        //LÄGG TILL FUNKTION OM 0 CUSTOMERS
+                        totalCustomers = customerCount;
+                        if (totalCustomers > 0)
+                        {
+                            customer = false;
+                        }
+                        else
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Needs atleast one customer");
+                            continue;
+                        }
+                    }
+
+
+                    int count = 1;
+                    for (int i = 0; i < totalCustomers; i++)
+                    {
+                        await using (var command =
+                                     db.CreateCommand($"INSERT INTO customer (firstname, lastname, email, phone, date_of_birth) VALUES ($1, $2, $3, $4, $5) RETURNING id"))
+                        {
+                            string? firstname = string.Empty;
+                            string lastname = string.Empty;
+                            string email = string.Empty;
+                            string phone = string.Empty;
+
+
+                            Console.Write("Customer " + count + ". Enter firstname: ");
+                            command.Parameters.AddWithValue(firstname = Console.ReadLine());
+                            Console.Clear();
+
+
+                            Console.WriteLine("Name: " + firstname);
+
+                            Console.Write("Customer " + count + ". Enter lastname: ");
+                            command.Parameters.AddWithValue(lastname = Console.ReadLine());
+                            Console.Clear();
+                            Console.WriteLine("Name: " + firstname + " " + lastname);
+
+                            Console.Write("Customer " + count + ". Email: ");
+                            command.Parameters.AddWithValue(email = Console.ReadLine());
+                            Console.Clear();
+                            Console.WriteLine("Name: " + firstname + " " + lastname + " Email: " + email);
+
+                            Console.Write("Customer " + count + ". Phone: ");
+                            command.Parameters.AddWithValue(phone = Console.ReadLine());
+                            Console.Clear();
+                            Console.WriteLine("Name: " + firstname + " " + lastname + " Email: " + email + " Phone: " +
+                                              phone);
+                            bool dob = true;
+                            while (dob)
+                            {
+                                Console.Write("Customer " + count + ". Date of Birth: ");
+                                if (!DateOnly.TryParse(Console.ReadLine(), out DateOnly DoB))
+                                {
+                                    await Console.Out.WriteLineAsync("Wrong date format YYYY-MM-DD.");
+                                    continue;
+                                }
+
+                                dob = false;
+                                command.Parameters.AddWithValue(DoB);
+                                Console.WriteLine();
+                            }
+
+                            int? newCustomerId = (int?)await command.ExecuteScalarAsync();
+
+                            await using (var comm = db.CreateCommand($"INSERT INTO customer_x_booking (booking_id, customer_id) VALUES ({lastBookingId}, {newCustomerId})"))
+                            {
+                                await comm.ExecuteNonQueryAsync();
+                            }
+
+                            count++;
+                        }
+                    }
+
+                    await Console.Out.WriteLineAsync("Bra jobbat!!!!");
+
+
+                    break;
                 }
-
-                await Console.Out.WriteLineAsync("Bra jobbat!!!!");
-
-
-                string result = string.Empty;
-
-
-                string query = $"select customer_id from customer_x_booking where booking_id = {lastBookingId}";
-                var reader = await db.CreateCommand(query).ExecuteReaderAsync();
-
-                while (await reader.ReadAsync()) // Bokning och kund läggs till men programmet crashar efteråt här, vad gör den? 
-                {
-                    Console.WriteLine(reader.GetInt32(1));
-                    result += reader.GetInt32(1);
-                }
-
-
-
-                Console.ReadKey();
-
-
-
-
-                break;
             }
         }
     }
@@ -296,7 +315,7 @@ public class Booking(NpgsqlDataSource db)
                             break;
                         }
 
-                    
+
                     case "4":
 
                         Console.Clear();
@@ -539,5 +558,6 @@ public class Booking(NpgsqlDataSource db)
             }
         }
     }
+
 
 }
