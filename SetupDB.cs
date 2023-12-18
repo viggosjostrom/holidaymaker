@@ -9,16 +9,15 @@ namespace holidaymaker;
 
 public class SetupDB()
 {
-    public static async Task NewDB()
-    {
-        string dbUri =
-            "Host=localhost;Port=5455;Username=postgres;Password=postgres;Database=holidaymaker"; //Inloggning till databasen port, password osv
+	public static async Task NewDB()
+	{
+		string dbUri = "Host=localhost;Port=5455;Username=postgres;Password=postgres;Database=holidaymaker"; //Inloggning till databasen port, password osv
 
 
-        await using var db = NpgsqlDataSource.Create(dbUri);
+		await using var db = NpgsqlDataSource.Create(dbUri);
 
 
-        await using var cmd = db.CreateCommand(@"
+		await using var cmd = db.CreateCommand(@"
 
 	CREATE TABLE IF NOT EXISTS resort(
 	id SERIAL PRIMARY KEY,
@@ -86,7 +85,7 @@ public class SetupDB()
 
 	CREATE TABLE IF NOT EXISTS customer_x_booking(
 	id SERIAL PRIMARY KEY,
-	booking_id SERIAL REFERENCES booking(id),
+	booking_id SERIAL REFERENCES booking(id) ON DELETE CASCADE,
 	customer_id SERIAL REFERENCES customer(id)
 	);
 
@@ -100,11 +99,11 @@ name)
 	('night entertainment');
 
 INSERT INTO public.extras(
-    name, price)
-    VALUES 
-    ('Extra bed', 50),
-    ('All inclusive', 1000),
-    ('Half pension', 500);
+	name, price)
+	VALUES 
+	('Extra bed', 50),
+	('All inclusive', 1000),
+	('Half pension', 500);
 
 INSERT INTO public.resort(
 name, city, dist_beach, dist_centrum, stars)
@@ -248,9 +247,9 @@ VALUES
 
 
 INSERT INTO public.booking_x_extras(
-    booking_id, extras_id)
-    VALUES 
-    (4, 2),
+	booking_id, extras_id)
+	VALUES 
+	(4, 2),
 	(4, 1),
 	(59, 3),
 	(32, 2),
@@ -272,35 +271,35 @@ INSERT INTO public.booking_x_extras(
 	(6, 1);
 
 INSERT INTO public.resort_x_amenities(
-    resort_id, amenities_id)
-    VALUES 
-    (1, 1),
-    (1, 2),
+	resort_id, amenities_id)
+	VALUES 
+	(1, 1),
+	(1, 2),
 	(1, 4),
-    (2, 1),
+	(2, 1),
 	(2, 2),
-    (2, 3),
+	(2, 3),
 	(2, 4),
-    (3, 2),
+	(3, 2),
 	(3, 4),
-    (4, 2),
+	(4, 2),
 	(4, 3),
-    (4, 1),
+	(4, 1),
 	(5, 2);
 
 INSERT INTO public.resort_x_extras(
-    resort_id, extras_id)
-    VALUES 
-    (1, 1),
-    (1, 2),
+	resort_id, extras_id)
+	VALUES 
+	(1, 1),
+	(1, 2),
 	(1, 3),
-    (2, 1),
+	(2, 1),
 	(2, 2),
-    (2, 3),
+	(2, 3),
 	(3, 1),
-    (3, 3),
+	(3, 3),
 	(4, 1),
-    (4, 3),
+	(4, 3),
 	(5, 1);
 	
 	
@@ -415,14 +414,14 @@ INSERT INTO public.customer_x_booking(
 (63, 3),
 (64, 9);
 
-ALTER TABLE public.room ADD FOREIGN KEY (resort_id) references resort(id);
+ALTER TABLE public.room ADD FOREIGN KEY (resort_id) references resort(id); 
 ALTER TABLE public.booking ADD FOREIGN KEY (room_id) references room(id);
 
 
 
-        ");
-        {
-        }
-        await cmd.ExecuteNonQueryAsync();
-    }
+		");
+		{
+		}
+		await cmd.ExecuteNonQueryAsync();
+	}
 }
