@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -59,7 +60,7 @@ public class SearchFunctions(NpgsqlDataSource db)
             bool searchmenu = true;
             while (searchmenu)
             {
-                await Console.Out.WriteLineAsync("Pick an option.\n\n1. Filter\n\n2. Order by\n\n3. Search room.");
+                await Console.Out.WriteLineAsync("Pick an option.\n\n1. Filter\n\n2. Order by\n\n3. Search room.\n\n4. Start booking\n\n5. Return to menu");
                 string? searchInput = Console.ReadLine();
                 switch (searchInput)
                 {
@@ -280,7 +281,7 @@ public class SearchFunctions(NpgsqlDataSource db)
                                     Console.Write($"| {resortid + "\t\t"}| {roomId + "\t\t"}| {sqm + "\t"}| {price + "\t"}|");
                                     if (resortName.Length > 14)
                                     {
-                                        await Console.Out.WriteAsync($"{resortName +""}| {distToBeach + "\t"}| {distToCentrum}\t  |");
+                                        await Console.Out.WriteAsync($"{resortName + ""}| {distToBeach + "\t"}| {distToCentrum}\t  |");
                                     }
                                     else
                                     {
@@ -300,30 +301,33 @@ public class SearchFunctions(NpgsqlDataSource db)
                                 }
                                 Console.WriteLine("--------------------------------------------------------------------------------------------------------------------------");
 
-
                                 await Console.Out.WriteLineAsync();
-                                //add searchfilter here!!!
-
-
-
                                 await Console.Out.WriteLineAsync();
                                 break;
                             }
 
-
-
-
                         }
+
+                    case "4":
+                        int room_id = 0;
+                        Booking n = new Booking(db);
+                        await n.New(in_date, out_date);
+                        continue;
+
+                    case "5":
+                        await Console.Out.WriteLineAsync("Return to main menu.");
+                        break;
+
                     default:
                         continue;
 
 
 
-                }
+                }break;
             }
+            break;
 
         }
-
     }
 }
 

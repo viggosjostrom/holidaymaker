@@ -9,14 +9,14 @@ namespace holidaymaker;
 
 public class Booking(NpgsqlDataSource db)
 {
-    public async Task New()
+    public async Task New(DateOnly in_date, DateOnly out_date)
     {
+
         bool resort = true;
         bool room = false;
         bool customer = true;
         bool datefirst = false;
         bool dateSecond = false;
-        Console.Clear();
         while (true)
         {
 
@@ -39,7 +39,6 @@ public class Booking(NpgsqlDataSource db)
                                 cmd.Parameters.AddWithValue(resort_id);
                                 resort = false;
                                 room = true;
-                                Console.Clear();
                             }
                             else
                             {
@@ -48,10 +47,6 @@ public class Booking(NpgsqlDataSource db)
                             }
 
                         }
-
-
-
-
                     }
                     else
                     {
@@ -71,6 +66,7 @@ public class Booking(NpgsqlDataSource db)
 
                                 if (numberCheck > 0)
                                 {
+                                    cmd.Parameters.AddWithValue(room_id);
                                     room = false;
                                     datefirst = true;
                                     Console.Clear();
@@ -91,40 +87,20 @@ public class Booking(NpgsqlDataSource db)
                         }
                     }
 
-
                     if (datefirst)
                     {
-                        Console.Write("Enter in date (YYYY-MM-DD): ");
-                        if (!DateOnly.TryParse(Console.ReadLine(), out DateOnly in_date))
-                        {
-                            Console.Clear();
-                            Console.WriteLine("Wrong input, try again! ");
-                            continue;
-                        }
-
                         cmd.Parameters.AddWithValue(in_date);
                         datefirst = false;
                         dateSecond = true;
-                        Console.Clear();
                     }
 
                     if (dateSecond)
                     {
-                        Console.Write("Enter out date (YYYY-MM-DD): ");
-                        if (!DateOnly.TryParse(Console.ReadLine(), out DateOnly out_date))
-                        {
-                            Console.Clear();
-                            Console.WriteLine("Wrong input, try again! ");
-                            continue;
-                        }
-
-                        cmd.Parameters.AddWithValue(out_date);
+                         cmd.Parameters.AddWithValue(out_date);
                         Console.Clear();
                     }
 
-                    //IF IN AND OUTDATE IS NOT VIABLE THEN LOOP DATES.
-                    int? lastBookingId = (int?)await cmd.ExecuteScalarAsync();
-
+                 int? lastBookingId = (int?)await cmd.ExecuteScalarAsync();
 
                     int totalCustomers = 0;
                     if (customer)
@@ -137,7 +113,6 @@ public class Booking(NpgsqlDataSource db)
                             continue;
                         }
 
-                        //LÄGG TILL FUNKTION OM 0 CUSTOMERS
                         totalCustomers = customerCount;
                         if (totalCustomers > 0)
                         {
@@ -212,7 +187,13 @@ public class Booking(NpgsqlDataSource db)
                         }
                     }
 
-                    await Console.Out.WriteLineAsync("Bra jobbat!!!!");
+                    await Console.Out.WriteLineAsync("Du har nu genomfört bokningen!");
+
+
+                    //lägg till extras här!
+
+
+                    //Lägg till kundbekräftelse här!
 
 
                     break;
