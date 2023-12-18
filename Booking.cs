@@ -205,6 +205,7 @@ public class Booking(NpgsqlDataSource db)
                 switch (Console.ReadLine())
                 {
                     case "1":
+
                         Console.Clear();
 
                         await using (var cmd = db.CreateCommand(
@@ -231,6 +232,7 @@ public class Booking(NpgsqlDataSource db)
                         break;
 
                     case "2":
+
                         Console.Clear();
 
                         await using (var cmd = db.CreateCommand(
@@ -256,6 +258,7 @@ public class Booking(NpgsqlDataSource db)
 
 
                     case "3":
+
                         Console.Clear();
 
                         await using (var cmd = db.CreateCommand(
@@ -278,10 +281,9 @@ public class Booking(NpgsqlDataSource db)
 
 
                     case "4":
+
                         Console.Clear();
 
-                        string extraName = string.Empty;
-                        int extraID = 0;
 
                         string qViewExtras = @$"
                                         SELECT extras.name, booking_x_extras.booking_id, extras.id
@@ -289,7 +291,7 @@ public class Booking(NpgsqlDataSource db)
                                         JOIN booking_x_extras ON extras.id = booking_x_extras.extras_id
                                         WHERE booking_id = {bookingID}
                                          ";
-                    
+
 
                         await using (var cmd = db.CreateCommand(qViewExtras))
                         await using (var reader = await cmd.ExecuteReaderAsync())
@@ -300,17 +302,15 @@ public class Booking(NpgsqlDataSource db)
                                 Console.WriteLine("ID: " + reader.GetInt32(2));
                                 Console.WriteLine("Label: " + reader.GetString(0));
                                 Console.WriteLine();
-
-                                extraName = reader.GetString(0);
-                                extraID = reader.GetInt32(2);
                             }
                         }
+                        Console.WriteLine();
+                        Console.WriteLine();
+                        Console.ReadKey();
 
-                        Console.ReadKey(); 
 
 
-
-                        Console.WriteLine("1: Add extras"); // Ska in gå att lägga till om redan finns! Hur göras om två "extras" finns på samma bokning?
+                        Console.WriteLine("1: Add extras"); // Ska inte gå att lägga till om redan finns! Hur göras om två "extras" finns på samma bokning?
                         Console.WriteLine("2: Delete extras");
                         Console.WriteLine("3: View avalible extras");
                         Console.WriteLine("0: Return to main menu");
@@ -321,7 +321,23 @@ public class Booking(NpgsqlDataSource db)
 
                             case "1":// får inte till rätt query för att kolla om den redan finns eller inte?
 
+                                string qAvailableViewExtras = @$"
+                                        SELECT extras.name, price, extras.id
+                                        FROM extras";
 
+                                await using (var cmd = db.CreateCommand(qAvailableViewExtras))
+                                await using (var reader = await cmd.ExecuteReaderAsync())
+                                {
+                                    Console.Clear();
+                                    Console.WriteLine("Available extras: ");
+                                    while (await reader.ReadAsync())
+                                    {
+                                        Console.WriteLine("ID: " + reader.GetInt32(2));
+                                        Console.WriteLine("Label: " + reader.GetString(0));
+                                        Console.WriteLine("Price: " + reader.GetDecimal(1));
+                                        Console.WriteLine();
+                                    }
+                                }
 
                                 Console.WriteLine("Which extra would you like to add? (Enter the extrasID)");
                                 if (int.TryParse(Console.ReadLine(), out int extrasIDs))
@@ -351,6 +367,20 @@ public class Booking(NpgsqlDataSource db)
 
                             case "2":
 
+                                await using (var cmd = db.CreateCommand(qViewExtras))
+                                await using (var reader = await cmd.ExecuteReaderAsync())
+                                {
+                                    Console.WriteLine("Your current extras: ");
+                                    while (await reader.ReadAsync())
+                                    {
+                                        Console.WriteLine("ID: " + reader.GetInt32(2));
+                                        Console.WriteLine("Label: " + reader.GetString(0));
+                                        Console.WriteLine();
+                                    }
+                                }
+                                Console.WriteLine();
+                                Console.WriteLine();
+
                                 Console.WriteLine("Which extra would you like to delete? (Enter the extrasID)");
                                 if (int.TryParse(Console.ReadLine(), out int extrasID))
                                 {
@@ -361,7 +391,7 @@ public class Booking(NpgsqlDataSource db)
                                         await cmd.ExecuteNonQueryAsync();
                                     }
 
-                                    Console.WriteLine($"Extra with ID: {extrasID}");
+                                    Console.WriteLine($" you deleted extra with ID: {extrasID}");
                                     Thread.Sleep(3000);
                                     Console.Clear();
                                 }
