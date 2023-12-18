@@ -198,7 +198,8 @@ public class Booking(NpgsqlDataSource db)
                 Console.WriteLine("1: Change room");
                 Console.WriteLine("2: Change check in date");
                 Console.WriteLine("3: Change checkout date");
-                Console.WriteLine("4: Change extras");
+                Console.WriteLine("4: Delete");
+                Console.WriteLine("5: Change extras");
                 Console.WriteLine("0: Return to main menu");
 
                 switch (Console.ReadLine())
@@ -293,7 +294,7 @@ public class Booking(NpgsqlDataSource db)
                         break;
 
 
-                    case "4":
+                    case "5":
 
                         Console.Clear();
 
