@@ -33,7 +33,7 @@ public class Booking(NpgsqlDataSource db)
                         continue;
                     }
 
-                    cmd.Parameters.AddWithValue(resort_id);
+                    cmd.Parameters.AddWithValue("$1", resort_id);
                     resort = false;
                     room = true;
                     Console.Clear();
@@ -48,7 +48,7 @@ public class Booking(NpgsqlDataSource db)
                         Console.WriteLine("Wrong input, try again! ");
                         continue;
                     }
-                    cmd.Parameters.AddWithValue(room_id);
+                    cmd.Parameters.AddWithValue("$2", room_id);
                     room = false;
                     datefirst = true;
                     Console.Clear();
@@ -66,7 +66,7 @@ public class Booking(NpgsqlDataSource db)
                         continue;
                     }
 
-                    cmd.Parameters.AddWithValue(in_date);
+                    cmd.Parameters.AddWithValue("$3", in_date);
                     datefirst = false;
                     dateSecond = true;
                     Console.Clear();
@@ -82,13 +82,13 @@ public class Booking(NpgsqlDataSource db)
                         continue;
                     }
 
-                    cmd.Parameters.AddWithValue(out_date);
+                    cmd.Parameters.AddWithValue("$4", out_date);
                     Console.Clear();
                 }
 
                 //IF IN AND OUTDATE IS NOT VIABLE THEN LOOP DATES.
                 int? lastBookingId = (int?)await cmd.ExecuteScalarAsync();
-
+            
 
                 int totalCustomers = 0;
                 if (customer)
@@ -174,13 +174,35 @@ public class Booking(NpgsqlDataSource db)
                     }
                 }
                 await Console.Out.WriteLineAsync("Bra jobbat!!!!");
+
+
+                string result = string.Empty;
+
+
+                string query = $"select customer_id from customer_x_booking where booking_id = {lastBookingId}";
+                var reader = await db.CreateCommand(query).ExecuteReaderAsync();
+
+                while (await reader.ReadAsync())
+                {
+                    Console.WriteLine(reader.GetInt32(1));
+                    result += reader.GetInt32(1);
+                }
+
+
+
                 Console.ReadKey();
+
+
+
 
                 break;
             }
 
         }
     }
+
+
+
 
     public async Task Edit()
     {
@@ -321,96 +343,4 @@ public class Booking(NpgsqlDataSource db)
         }
     }
 
-    public async Task OrderBy()
-    {
-        Console.WriteLine("What do you want to order by?");
-        Console.WriteLine("1: Distance beach");
-        Console.WriteLine("2: Distance to centrum");
-        Console.WriteLine("3: Price");
-        Console.WriteLine("4: Stars");
-        Console.WriteLine("");
-
-        if (int.TryParse(Console.ReadLine(),
-                out int input)) // Lade till en if med tryparse för att kunna hantera oväntade inputs
-        {
-            //int input = int.Parse(Console.ReadLine());
-            string orderByResult = string.Empty;
-            switch (input)
-            {
-                case 1:
-
-                    Console.WriteLine("What is the max distance to the beach?");
-                    int.TryParse(Console.ReadLine(), out int maxBeach);
-                    orderByResult = $"WHERE dist_beach <= {maxBeach}";
-                    break;
-
-                case 2:
-                    Console.WriteLine("What is the max distance to the centrum?");
-                    int.TryParse(Console.ReadLine(), out int maxCentrum);
-                    orderByResult = $"WHERE dist_centrum <= {maxCentrum}";
-                    break;
-
-                case 3:
-                    orderByResult = "ORDER BY price ASC";
-                    break;
-
-                case 4:
-                    orderByResult = "ORDER BY stars DESC";
-                    break;
-
-
-                default:
-                    Console.WriteLine("Sorry this was not a valid choice.");
-                    break;
-            }
-
-
-            await using (var cmd = db.CreateCommand(
-                             $@" SELECT * FROM public.resort JOIN room ON resort_id = resort.id {orderByResult};"))
-            {
-                await cmd.ExecuteNonQueryAsync();
-            }
-        }
-
-        else
-        {
-            Console.WriteLine("Wrong input, please try again");
-            Console.ReadKey();
-            Console.Clear();
-        }
-    }
-
-    public async Task Search()
-    {
-        string query = "select * from booking";
-        var reader = await db.CreateCommand(query).ExecuteReaderAsync();
-
-        while (await reader.ReadAsync())
-        {
-            Console.WriteLine(reader.GetInt32(0) + ", " + reader.GetString(1));
-        }
-    }
-
-    public class SearchPage(NpgsqlDataSource db)
-    {
-        public async Task<string> Allbookings()
-        {
-            string result = string.Empty;
-
-
-            string query = "select * from booking";
-            var reader = await db.CreateCommand(query).ExecuteReaderAsync();
-
-            while (await reader.ReadAsync())
-            {
-                // Console.WriteLine(reader.GetInt32(0) + ", " + reader.GetString(1));
-                result += reader.GetInt32(0);
-                result += ", ";
-                result += reader.GetString(1);
-            }
-
-            return result;
-        }
-
-    }
 }
