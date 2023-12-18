@@ -9,6 +9,7 @@ await using var db = NpgsqlDataSource.Create(dbUri);
 
 while (true)
 {
+
     Console.WriteLine("1: Register new customer");
     Console.WriteLine("2: New booking");
     Console.WriteLine("3: Edit booking");
