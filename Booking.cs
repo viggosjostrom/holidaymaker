@@ -20,9 +20,8 @@ public class Booking(NpgsqlDataSource db)
         bool newbooking = true;
         while (newbooking)
         {
-
             await using (var cmd = db.CreateCommand(
-                            "INSERT INTO booking (resort_id, room_id, in_date, out_date) VALUES ($1, $2, $3, $4) RETURNING id"))
+                             "INSERT INTO booking (resort_id, room_id, in_date, out_date) VALUES ($1, $2, $3, $4) RETURNING id"))
             {
                 if (resort)
                 {
@@ -49,12 +48,12 @@ public class Booking(NpgsqlDataSource db)
                         Console.WriteLine("Wrong input, try again! ");
                         continue;
                     }
+
                     cmd.Parameters.AddWithValue(room_id);
                     room = false;
                     datefirst = true;
                     Console.Clear();
                 }
-
 
 
                 if (datefirst)
@@ -101,12 +100,12 @@ public class Booking(NpgsqlDataSource db)
                         Console.WriteLine("Wrong input");
                         continue;
                     }
+
                     //LÄGG TILL FUNKTION OM 0 CUSTOMERS
                     totalCustomers = customerCount;
                     if (totalCustomers > 0)
                     {
                         customer = false;
-
                     }
                     else
                     {
@@ -120,8 +119,8 @@ public class Booking(NpgsqlDataSource db)
                 int count = 1;
                 for (int i = 0; i < totalCustomers; i++)
                 {
-
-                    await using (var command = db.CreateCommand($"INSERT INTO customer (firstname, lastname, email, phone, date_of_birth) VALUES ($1, $2, $3, $4, $5) RETURNING id"))
+                    await using (var command =
+                                 db.CreateCommand($"INSERT INTO customer (firstname, lastname, email, phone, date_of_birth) VALUES ($1, $2, $3, $4, $5) RETURNING id"))
                     {
                         string? firstname = string.Empty;
                         string lastname = string.Empty;
@@ -149,17 +148,18 @@ public class Booking(NpgsqlDataSource db)
                         Console.Write("Customer " + count + ". Phone: ");
                         command.Parameters.AddWithValue(phone = Console.ReadLine());
                         Console.Clear();
-                        Console.WriteLine("Name: " + firstname + " " + lastname + " Email: " + email + " Phone: " + phone);
+                        Console.WriteLine("Name: " + firstname + " " + lastname + " Email: " + email + " Phone: " +
+                                          phone);
                         bool dob = true;
                         while (dob)
                         {
-
                             Console.Write("Customer " + count + ". Date of Birth: ");
                             if (!DateOnly.TryParse(Console.ReadLine(), out DateOnly DoB))
                             {
                                 await Console.Out.WriteLineAsync("Wrong date format YYYY-MM-DD.");
                                 continue;
                             }
+
                             dob = false;
                             command.Parameters.AddWithValue(DoB);
                             Console.WriteLine();
@@ -171,16 +171,17 @@ public class Booking(NpgsqlDataSource db)
                         {
                             await comm.ExecuteNonQueryAsync();
                         }
+
                         count++;
                     }
                 }
+
                 newbooking = false;
                 await Console.Out.WriteLineAsync("Bra jobbat!!!!");
                 Console.ReadKey();
 
                 break;
             }
-
         }
     }
 
@@ -199,6 +200,7 @@ public class Booking(NpgsqlDataSource db)
                 Console.WriteLine("1: Change room");
                 Console.WriteLine("2: Change check in date");
                 Console.WriteLine("3: Change checkout date");
+                Console.WriteLine("4: Delete booking");
                 Console.WriteLine("0: Return to main menu");
 
                 switch (Console.ReadLine())
@@ -206,8 +208,7 @@ public class Booking(NpgsqlDataSource db)
                     case "1":
                         Console.Clear();
 
-                        await using (var cmd = db.CreateCommand(
-                                         $"UPDATE public.booking SET room_id = $1 WHERE id = {bookingID}"))
+                        await using (var cmd = db.CreateCommand($"UPDATE public.booking SET room_id = $1 WHERE id = {bookingID}"))
                         {
                             Console.WriteLine("New room choice: ");
                             if (!int.TryParse(Console.ReadLine(), out int editRoom))
@@ -232,8 +233,7 @@ public class Booking(NpgsqlDataSource db)
                     case "2":
                         Console.Clear();
 
-                        await using (var cmd = db.CreateCommand(
-                                         $"UPDATE public.booking SET in_date = $1 WHERE id = {bookingID}"))
+                        await using (var cmd = db.CreateCommand($"UPDATE public.booking SET in_date = $1 WHERE id = {bookingID}"))
                         {
                             Console.WriteLine("New Date (checkin): ");
 
@@ -250,15 +250,13 @@ public class Booking(NpgsqlDataSource db)
                             cmd.Parameters.AddWithValue(dateIn);
                             await cmd.ExecuteNonQueryAsync();
                             break;
-
                         }
 
 
                     case "3":
                         Console.Clear();
 
-                        await using (var cmd = db.CreateCommand(
-                                         $"UPDATE public.booking SET out_date = $1 WHERE id = {bookingID}"))
+                        await using (var cmd = db.CreateCommand($"UPDATE public.booking SET out_date = $1 WHERE id = {bookingID}"))
                         {
                             Console.WriteLine("New Date (checkout): ");
                             if (!DateOnly.TryParse(Console.ReadLine(), out DateOnly dateOut))
@@ -274,6 +272,24 @@ public class Booking(NpgsqlDataSource db)
                             await cmd.ExecuteNonQueryAsync();
                             break;
                         }
+
+                    case "4":
+                        Console.Clear();
+                        Console.WriteLine("Confirm delete");
+
+                        string answer = Console.ReadLine();
+                        if (answer.ToLower() == "yes" || answer.ToLower() == "y")
+                        {
+                            await using (var cmd2 = db.CreateCommand($"DELETE FROM public.booking WHERE id = {bookingID}"))
+                            {
+                                await using (var cmd1 = db.CreateCommand($"DELETE FROM public.customer_x_booking WHERE booking_id = {bookingID}"))
+                                {
+                                    await cmd1.ExecuteNonQueryAsync();
+                                }
+                                await cmd2.ExecuteNonQueryAsync();
+                            }
+                        }
+                        break;
 
 
 
@@ -398,8 +414,7 @@ public class Booking(NpgsqlDataSource db)
         public async Task<string> Allbookings()
         {
             string result = string.Empty;
-
-
+            
             string query = "select * from booking";
             var reader = await db.CreateCommand(query).ExecuteReaderAsync();
 
@@ -413,6 +428,5 @@ public class Booking(NpgsqlDataSource db)
 
             return result;
         }
-
     }
 }
