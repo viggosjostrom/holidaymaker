@@ -21,6 +21,7 @@ public class SearchFunctions(NpgsqlDataSource db)
             string roomSqm = string.Empty;
             string Amenity = string.Empty;
             string orderByResult = string.Empty;
+            string cityChoice = string.Empty;
 
             Console.WriteLine("SEARCH AVALIABLE ROOMS");
             Console.WriteLine("Enter desired check in date (YYYY-MM-DD): ");
@@ -74,6 +75,9 @@ public class SearchFunctions(NpgsqlDataSource db)
 
                             case "1": //city
                                 Console.Clear();
+                                Console.WriteLine("Choose a city: ");
+                                string? inputCity = Console.ReadLine();
+                                cityChoice = $"AND rs.city LIKE '%{inputCity}%'";
                                 break;
 
                             case "2": //Sqm
@@ -245,7 +249,9 @@ public class SearchFunctions(NpgsqlDataSource db)
             {Amenity}
             )
 
-        {roomSqm} {orderByResult}
+        {roomSqm} 
+        {cityChoice} 
+        {orderByResult}
 "
 
     ))
