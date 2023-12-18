@@ -52,8 +52,10 @@ while (true)
                 continue;
 
             case 0:
-                System.Environment.Exit(666);
                 Console.Clear();
+                Ending.Text();
+                Ending.PlayMelody();
+                System.Environment.Exit(666);
                 break;
 
             default:
