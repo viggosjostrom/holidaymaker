@@ -315,6 +315,7 @@ public class SearchFunctions(NpgsqlDataSource db)
 
                         }
                     default:
+                        Console.WriteLine("Wrong input!");
                         continue;
 
 
