@@ -17,8 +17,7 @@ public class Booking(NpgsqlDataSource db)
         bool datefirst = false;
         bool dateSecond = false;
         Console.Clear();
-        bool newbooking = true;
-        while (newbooking)
+        while (true)
         {
             await using (var cmd = db.CreateCommand(
                              "INSERT INTO booking (resort_id, room_id, in_date, out_date) VALUES ($1, $2, $3, $4) RETURNING id"))
@@ -177,6 +176,7 @@ public class Booking(NpgsqlDataSource db)
                 }
 
                 newbooking = false;
+
                 await Console.Out.WriteLineAsync("Bra jobbat!!!!");
                 Console.ReadKey();
 
