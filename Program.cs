@@ -4,7 +4,8 @@ using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 
 //await SetupDB.NewDB();
-string dbUri = "Host=localhost;Port=5455;Username=postgres;Password=postgres;Database=holidaymaker"; //Inloggning till databasen port, password osv
+//kommentera bort för ny Databas setup
+string dbUri = "Host=localhost;Port=5455;Username=postgres;Password=postgres;Database=holidaymaker";
 await using var db = NpgsqlDataSource.Create(dbUri);
 
 while (true)
@@ -44,10 +45,11 @@ while (true)
                 continue;
 
             case 5:
-               Console.Clear();
-               SearchFunctions q = new SearchFunctions(db);
-               await q.AvaliableRooms();
-               continue;
+                Console.Clear();
+                SearchFunctions q = new SearchFunctions(db);
+                await q.AvaliableRooms();
+
+                continue;
 
             case 0:
                 Console.Clear();
@@ -71,6 +73,6 @@ while (true)
         Console.ReadKey();
         continue;
     }
-    // Är osäker på om vi behöver detta eller vad det ska stå här.
+
     throw new Exception("Program not loaded, shuting down");
 }
