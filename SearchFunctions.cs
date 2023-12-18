@@ -14,8 +14,8 @@ public class SearchFunctions(NpgsqlDataSource db)
 {
     public async Task AvaliableRooms()
     {
-
-        while (true)
+        bool loop = true;
+        while (loop)
         {
             string beachDistance = string.Empty;
             string centrumDistance = string.Empty;
@@ -89,7 +89,6 @@ public class SearchFunctions(NpgsqlDataSource db)
                                 {
                                     roomSqm = $"AND r.sqm >= {sqmInt}";
                                     Console.Clear();
-
                                     break;
                                 }
                                 else
@@ -316,6 +315,9 @@ public class SearchFunctions(NpgsqlDataSource db)
 
                     case "5":
                         await Console.Out.WriteLineAsync("Return to main menu.");
+                        loop = false;
+                        searchmenu = false;
+                        Console.Clear();
                         break;
 
                     default:
@@ -323,7 +325,7 @@ public class SearchFunctions(NpgsqlDataSource db)
 
 
 
-                }break;
+                }
             }
             break;
 
