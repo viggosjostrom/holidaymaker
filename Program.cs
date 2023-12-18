@@ -44,29 +44,10 @@ while (true)
                 continue;
 
             case 5:
-                Console.Clear();
-                Console.WriteLine("1: Custom search");
-                Console.WriteLine("2: See all (OrderBy)");
-                if (int.TryParse(Console.ReadLine(), out int userInput2))
-                {
-                    switch (userInput2)
-                    {
-                        case 1:
-                            Console.Clear();
-                            SearchFunctions q = new SearchFunctions(db);
-                            await q.AvaliableRooms();
-                            break;
-
-
-                        case 2:
-                            Console.Clear();
-                            Booking s = new Booking(db);
-                            await s.OrderBy();
-                            break;
-                    }
-                }
-
-                continue;
+               Console.Clear();
+               SearchFunctions q = new SearchFunctions(db);
+               await q.AvaliableRooms();
+               continue;
 
             case 0:
                 Console.Clear();
