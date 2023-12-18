@@ -15,7 +15,6 @@ while (true)
     Console.WriteLine("2: New booking");
     Console.WriteLine("3: Edit booking");
     Console.WriteLine("4: Delete booking");
-    Console.WriteLine("5: Search room");
     Console.WriteLine("0: EXIT");
 
     if (int.TryParse(Console.ReadLine(), out int userInput))
@@ -29,8 +28,9 @@ while (true)
                 continue;
 
             case 2:
-                Booking b = new Booking(db);
-                await b.New();
+                Console.Clear();
+                SearchFunctions q = new SearchFunctions(db);
+                await q.AvaliableRooms();
                 continue;
 
             case 3:
@@ -42,13 +42,6 @@ while (true)
             case 4:
                 Booking d = new Booking(db);
                 await d.Delete();
-                continue;
-
-            case 5:
-                Console.Clear();
-                SearchFunctions q = new SearchFunctions(db);
-                await q.AvaliableRooms();
-
                 continue;
 
             case 0:
