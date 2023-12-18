@@ -365,8 +365,8 @@ public class Booking(NpgsqlDataSource db)
                                 break;
 
 
-                            case "2":
-
+                            case "2": // Finns det mer än en extra av samma typ tas alla bort. Tex finns 2 st "ID 1" tas båda bort om man väljer "1"
+                                Console.Clear();
                                 await using (var cmd = db.CreateCommand(qViewExtras))
                                 await using (var reader = await cmd.ExecuteReaderAsync())
                                 {
@@ -391,7 +391,7 @@ public class Booking(NpgsqlDataSource db)
                                         await cmd.ExecuteNonQueryAsync();
                                     }
 
-                                    Console.WriteLine($" you deleted extra with ID: {extrasID}");
+                                    Console.WriteLine($"You deleted extra with ID: {extrasID}");
                                     Thread.Sleep(3000);
                                     Console.Clear();
                                 }
