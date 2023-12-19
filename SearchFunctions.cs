@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -77,13 +78,36 @@ public class SearchFunctions(NpgsqlDataSource db)
                             case "1": //city
                                 Console.Clear();
                                 Console.WriteLine("Choose a city: ");
-                                string? inputCity = Console.ReadLine();
-                                cityChoice = $"AND rs.city LIKE '%{inputCity}%'";
+                                Console.WriteLine("1: Malmö");
+                                Console.WriteLine("2: Helsingborg");
+                                Console.WriteLine("3: Åhus");
+                                Console.WriteLine("4: Bjärnum");
+
+                                if (int.TryParse(Console.ReadLine(), out int inputCity))
+                                {
+                                    switch (inputCity)
+                                    {
+                                        case 1:
+                                            cityChoice = $"AND rs.city LIKE '%Malmö%'";
+                                            break;
+
+                                        case 2:
+                                            cityChoice = $"AND rs.city LIKE '%Helsingborg%'";
+                                            break;
+                                        case 3:
+                                            cityChoice = $"AND rs.city LIKE '%Åhus%'";
+                                            break;
+                                        case 4:
+                                            cityChoice = $"AND rs.city LIKE '%Bjärnum%'";
+                                            break;
+                                    }
+                                }
                                 break;
+
 
                             case "2": //Sqm
                                 Console.Clear();
-                                Console.WriteLine("Choose minimun desired room-size (enter '0' if no preference): ");
+                                Console.WriteLine("Choose minimun desired room-size: ");
                                 string? inputSqm = Console.ReadLine();
                                 if (Int32.TryParse(inputSqm, out int sqmInt))
                                 {
@@ -101,8 +125,29 @@ public class SearchFunctions(NpgsqlDataSource db)
                             case "3": //Amenities
                                 Console.Clear();
                                 Console.WriteLine("Choose desired amenity. Enter keywords eg. pool, childclub, night entertainment or restaurant"); //skriv ut fler keywords
-                                string? amenityWord = Console.ReadLine();
-                                Amenity += $"AND LOWER(a.name) LIKE '%{amenityWord}%' ";
+                                Console.WriteLine("1: Pool");
+                                Console.WriteLine("2: Childclub");
+                                Console.WriteLine("3: Night entertainment");
+                                Console.WriteLine("4: Restaurant");
+                                if (int.TryParse(Console.ReadLine(), out int inputAmenities))
+                                {
+                                    switch (inputAmenities)
+                                    {
+                                        case 1:
+                                            Amenity += $"AND LOWER(a.name) LIKE '%pool%' ";
+                                            break;
+
+                                        case 2:
+                                            Amenity += $"AND LOWER(a.name) LIKE '%childclub%' ";
+                                            break;
+                                        case 3:
+                                            Amenity += $"AND LOWER(a.name) LIKE '%night entertainment%' ";
+                                            break;
+                                        case 4:
+                                            Amenity += $"AND LOWER(a.name) LIKE '%restaurant%' ";
+                                            break;
+                                    }
+                                }
                                 break;
 
                             case "4": //distance to beach
@@ -210,36 +255,36 @@ public class SearchFunctions(NpgsqlDataSource db)
                     case "3":
 
                         await using (var cmd = db.CreateCommand($@"SELECT
-        r.id AS room_id,
-        rs.id AS resort_id,
-        r.sqm,
-        r.price,
-        rs.name AS resort_name,
-        rs.city,
-        rs.dist_beach,
-        rs.dist_centrum,
-        rs.stars
-        FROM room r
-        JOIN
-        resort rs ON r.resort_id = rs.id
-        WHERE
-        r.id NOT IN(
-            SELECT
-                b.room_id
-            FROM
-                booking b
-            WHERE
-                (
-                    ('{in_date}' BETWEEN b.in_date AND b.out_date)
-                    OR('{out_date}' BETWEEN b.in_date AND b.out_date)
-                    OR(b.in_date BETWEEN '{in_date}' AND '{out_date}')
-                )
-        )
-        {beachDistance}
-        {centrumDistance}
-        AND EXISTS
+                        r.id AS room_id,
+                        rs.id AS resort_id,
+                        r.sqm,
+                        r.price,
+                        rs.name AS resort_name,
+                        rs.city,
+                        rs.dist_beach,
+                        rs.dist_centrum,
+                        rs.stars
+                        FROM room r
+                        JOIN
+                        resort rs ON r.resort_id = rs.id
+                        WHERE
+                        r.id NOT IN(
+                            SELECT
+                                b.room_id
+                            FROM
+                                booking b
+                            WHERE
+                                (
+                                    ('{in_date}' BETWEEN b.in_date AND b.out_date)
+                                    OR('{out_date}' BETWEEN b.in_date AND b.out_date)
+                                    OR(b.in_date BETWEEN '{in_date}' AND '{out_date}')
+                                )
+                        )
+                        {beachDistance}
+                        {centrumDistance}
+                        AND EXISTS
 
-            
+
             (
             SELECT 1
             FROM resort_x_amenities ra
@@ -304,6 +349,7 @@ public class SearchFunctions(NpgsqlDataSource db)
                                 await Console.Out.WriteLineAsync();
                                 break;
                             }
+
 
                         }
 
