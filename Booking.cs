@@ -4,14 +4,12 @@ using System.Data.SqlTypes;
 using System.Runtime.InteropServices;
 using System.Transactions;
 
-
 namespace holidaymaker;
 
 public class Booking(NpgsqlDataSource db)
 {
     public async Task New(DateOnly in_date, DateOnly out_date)
     {
-
         bool resort = true;
         bool room = false;
         bool customer = true;
@@ -19,10 +17,7 @@ public class Booking(NpgsqlDataSource db)
         bool dateSecond = false;
         while (true)
         {
-
-
-            await using (var cmd = db.CreateCommand(
-                             "INSERT INTO booking (resort_id, room_id, in_date, out_date) VALUES ($1, $2, $3, $4) RETURNING id"))
+            await using (var cmd = db.CreateCommand("INSERT INTO booking (resort_id, room_id, in_date, out_date) VALUES ($1, $2, $3, $4) RETURNING id"))
             {
                 if (resort)
                 {
@@ -33,7 +28,6 @@ public class Booking(NpgsqlDataSource db)
                         {
                             resortCheck.Parameters.AddWithValue(resort_id);
                             long numberCheck = (long)await resortCheck.ExecuteScalarAsync();
-
                             if (numberCheck > 0)
                             {
                                 cmd.Parameters.AddWithValue(resort_id);
@@ -42,18 +36,16 @@ public class Booking(NpgsqlDataSource db)
                             }
                             else
                             {
-                                Console.WriteLine("Sorry, resort id does not exist.");
+                                Console.WriteLine("Resort id does not exist.");
                                 continue;
                             }
-
                         }
                     }
                     else
                     {
-                        Console.WriteLine("Couldn't parse resort id");
+                        Console.WriteLine("Wrong input");
                         continue;
                     }
-
                     if (room)
                     {
                         Console.Write("Enter room id: ");
@@ -63,7 +55,6 @@ public class Booking(NpgsqlDataSource db)
                             {
                                 roomCheck.Parameters.AddWithValue(room_id);
                                 long numberCheck = (long)await roomCheck.ExecuteScalarAsync();
-
                                 if (numberCheck > 0)
                                 {
                                     cmd.Parameters.AddWithValue(room_id);
@@ -73,34 +64,29 @@ public class Booking(NpgsqlDataSource db)
                                 }
                                 else
                                 {
-                                    Console.WriteLine("Sorry, room id does not exist.");
+                                    Console.WriteLine("Room id does not exist.");
                                     continue;
                                 }
-
                             }
                         }
-
                         else
                         {
-                            Console.WriteLine("Not able to parse!");
+                            Console.WriteLine("Wrong input");
                             continue;
                         }
                     }
-
                     if (datefirst)
                     {
                         cmd.Parameters.AddWithValue(in_date);
                         datefirst = false;
                         dateSecond = true;
                     }
-
                     if (dateSecond)
                     {
-                         cmd.Parameters.AddWithValue(out_date);
+                        cmd.Parameters.AddWithValue(out_date);
                         Console.Clear();
                     }
-
-                 int? lastBookingId = (int?)await cmd.ExecuteScalarAsync();
+                    int? lastBookingId = (int?)await cmd.ExecuteScalarAsync();
 
                     int totalCustomers = 0;
                     if (customer)
@@ -112,7 +98,6 @@ public class Booking(NpgsqlDataSource db)
                             Console.WriteLine("Wrong input");
                             continue;
                         }
-
                         totalCustomers = customerCount;
                         if (totalCustomers > 0)
                         {
@@ -126,7 +111,6 @@ public class Booking(NpgsqlDataSource db)
                         }
                     }
 
-
                     int count = 1;
                     for (int i = 0; i < totalCustomers; i++)
                     {
@@ -138,29 +122,27 @@ public class Booking(NpgsqlDataSource db)
                             string email = string.Empty;
                             string phone = string.Empty;
 
-
                             Console.Write("Customer " + count + ". Enter firstname: ");
                             command.Parameters.AddWithValue(firstname = Console.ReadLine());
                             Console.Clear();
 
-
                             Console.WriteLine("Name: " + firstname);
-
                             Console.Write("Customer " + count + ". Enter lastname: ");
                             command.Parameters.AddWithValue(lastname = Console.ReadLine());
                             Console.Clear();
-                            Console.WriteLine("Name: " + firstname + " " + lastname);
 
+                            Console.WriteLine("Name: " + firstname + " " + lastname);
                             Console.Write("Customer " + count + ". Email: ");
                             command.Parameters.AddWithValue(email = Console.ReadLine());
                             Console.Clear();
-                            Console.WriteLine("Name: " + firstname + " " + lastname + " Email: " + email);
 
+                            Console.WriteLine("Name: " + firstname + " " + lastname + " Email: " + email);
                             Console.Write("Customer " + count + ". Phone: ");
                             command.Parameters.AddWithValue(phone = Console.ReadLine());
                             Console.Clear();
-                            Console.WriteLine("Name: " + firstname + " " + lastname + " Email: " + email + " Phone: " +
-                                              phone);
+
+                            Console.WriteLine("Name: " + firstname + " " + lastname + " Email: " + email + " Phone: " + phone);
+
                             bool dob = true;
                             while (dob)
                             {
@@ -170,49 +152,33 @@ public class Booking(NpgsqlDataSource db)
                                     await Console.Out.WriteLineAsync("Wrong date format YYYY-MM-DD.");
                                     continue;
                                 }
-
                                 dob = false;
                                 command.Parameters.AddWithValue(DoB);
                                 Console.WriteLine();
                             }
 
                             int? newCustomerId = (int?)await command.ExecuteScalarAsync();
-
                             await using (var comm = db.CreateCommand($"INSERT INTO customer_x_booking (booking_id, customer_id) VALUES ({lastBookingId}, {newCustomerId})"))
                             {
                                 await comm.ExecuteNonQueryAsync();
                             }
-
                             count++;
                         }
                     }
-
                     await Console.Out.WriteLineAsync("Du har nu genomfört bokningen!");
-
-
-                    //lägg till extras här!
-
-
-                    //Lägg till kundbekräftelse här!
-
-
                     break;
                 }
             }
         }
     }
 
-
-
-
     public async Task Edit()
     {
         Console.Clear();
-        Console.WriteLine("Please enter your bookingID: "); // Om inte bookningID finns?
+        Console.WriteLine("Please enter your bookingID: ");
         if (int.TryParse(Console.ReadLine(), out int bookingID))
         {
             bool edit = true;
-
             while (edit)
             {
                 Console.Clear();
@@ -226,9 +192,7 @@ public class Booking(NpgsqlDataSource db)
                 switch (Console.ReadLine())
                 {
                     case "1":
-
                         Console.Clear();
-
                         await using (var cmd = db.CreateCommand($"UPDATE public.booking SET room_id = $1 WHERE id = {bookingID}"))
                         {
                             Console.WriteLine("New room choice: ");
@@ -239,27 +203,20 @@ public class Booking(NpgsqlDataSource db)
                                 Console.ReadKey();
                                 continue;
                             }
-
                             cmd.Parameters.AddWithValue(editRoom);
                             await cmd.ExecuteNonQueryAsync();
-
                             Console.Clear();
-                            Console.WriteLine("You have now edited the room");
-                            Thread.Sleep(3000);
+                            Console.WriteLine("You have now edited the room, press any key to continue");
+                            Console.ReadKey();
                             Console.Clear();
                         }
-
                         break;
 
                     case "2":
-
                         Console.Clear();
-
                         await using (var cmd = db.CreateCommand($"UPDATE public.booking SET in_date = $1 WHERE id = {bookingID}"))
                         {
                             Console.WriteLine("New Date (checkin): ");
-
-
                             if (!DateOnly.TryParse(Console.ReadLine(), out DateOnly dateIn))
                             {
                                 Console.Clear();
@@ -268,17 +225,13 @@ public class Booking(NpgsqlDataSource db)
                                 Console.ReadKey();
                                 continue;
                             }
-
                             cmd.Parameters.AddWithValue(dateIn);
                             await cmd.ExecuteNonQueryAsync();
                             break;
                         }
 
-
                     case "3":
-
                         Console.Clear();
-
                         await using (var cmd = db.CreateCommand($"UPDATE public.booking SET out_date = $1 WHERE id = {bookingID}"))
                         {
                             Console.WriteLine("New Date (checkout): ");
@@ -290,26 +243,19 @@ public class Booking(NpgsqlDataSource db)
                                 Console.ReadKey();
                                 continue;
                             }
-
                             cmd.Parameters.AddWithValue(dateOut);
                             await cmd.ExecuteNonQueryAsync();
                             break;
                         }
 
-
                     case "4":
-
                         Console.Clear();
-
-
                         string qViewExtras = @$"
                                         SELECT extras.name, booking_x_extras.booking_id, extras.id
                                         FROM extras
                                         JOIN booking_x_extras ON extras.id = booking_x_extras.extras_id
                                         WHERE booking_id = {bookingID}
                                          ";
-
-
                         await using (var cmd = db.CreateCommand(qViewExtras))
                         await using (var reader = await cmd.ExecuteReaderAsync())
                         {
@@ -321,27 +267,15 @@ public class Booking(NpgsqlDataSource db)
                                 Console.WriteLine();
                             }
                         }
-                        Console.WriteLine();
-                        Console.WriteLine();
-                        Console.ReadKey();
-
-
-
-                        Console.WriteLine("1: Add extras"); // Ska inte gå att lägga till om redan finns! Hur göras om två "extras" finns på samma bokning?
+                        Console.WriteLine("\n\n1: Add extras");
                         Console.WriteLine("2: Delete extras");
                         Console.WriteLine("3: View avalible extras");
                         Console.WriteLine("0: Return to main menu");
 
-
                         switch (Console.ReadLine())
                         {
-
-                            case "1":// får inte till rätt query för att kolla om den redan finns eller inte?
-
-                                string qAvailableViewExtras = @$"
-                                        SELECT extras.name, price, extras.id
-                                        FROM extras";
-
+                            case "1":
+                                string qAvailableViewExtras = @$"SELECT extras.name, price, extras.id FROM extras";
                                 await using (var cmd = db.CreateCommand(qAvailableViewExtras))
                                 await using (var reader = await cmd.ExecuteReaderAsync())
                                 {
@@ -360,29 +294,25 @@ public class Booking(NpgsqlDataSource db)
                                 if (int.TryParse(Console.ReadLine(), out int extrasIDs))
                                 {
                                     await using (var cmd = db.CreateCommand(@$"
-                                    INSERT INTO public.booking_x_extras (booking_id, extras_id)
-                                    VALUES
-                                    ({bookingID},{extrasIDs});"))
-
+                                    INSERT INTO public.booking_x_extras (booking_id, extras_id) VALUES ({bookingID},{extrasIDs});"))
                                     {
                                         await cmd.ExecuteNonQueryAsync();
                                     }
                                     Console.WriteLine($"Added extra with ID: {extrasIDs}");
-                                    Thread.Sleep(3000);
+                                    Console.WriteLine("Press any key to continue");
+                                    Console.ReadKey();
                                     Console.Clear();
                                 }
                                 else
                                 {
-                                    Console.WriteLine("Extras does not exist, try again");
-                                    Console.WriteLine("Press any key to return to menu");
+                                    Console.WriteLine("Invalid option.\nPress any key to return to main menu");
                                     Console.ReadKey();
                                     Console.Clear();
+                                    continue;
                                 }
-
                                 break;
 
-
-                            case "2": // Finns det mer än en extra av samma typ tas alla bort. Tex finns 2 st "ID 1" tas båda bort om man väljer "1"
+                            case "2":
                                 Console.Clear();
                                 await using (var cmd = db.CreateCommand(qViewExtras))
                                 await using (var reader = await cmd.ExecuteReaderAsync())
@@ -395,39 +325,31 @@ public class Booking(NpgsqlDataSource db)
                                         Console.WriteLine();
                                     }
                                 }
-                                Console.WriteLine();
-                                Console.WriteLine();
 
-                                Console.WriteLine("Which extra would you like to delete? (Enter the extrasID)");
+                                Console.WriteLine("\n\nWhich extra would you like to delete? (Enter the extrasID)");
                                 if (int.TryParse(Console.ReadLine(), out int extrasID))
                                 {
                                     await using (var cmd = db.CreateCommand(@$"
-                                    DELETE FROM public.booking_x_extras 
-                                    WHERE booking_x_extras.extras_id = {extrasID} AND booking_id = {bookingID};"))
+                                    DELETE FROM public.booking_x_extras WHERE booking_x_extras.extras_id = {extrasID} AND booking_id = {bookingID};"))
                                     {
                                         await cmd.ExecuteNonQueryAsync();
                                     }
-
                                     Console.WriteLine($"You deleted extra with ID: {extrasID}");
-                                    Thread.Sleep(3000);
+                                    Console.WriteLine("Press any key to continue");
+                                    Console.ReadKey();
                                     Console.Clear();
                                 }
                                 else
                                 {
-                                    Console.WriteLine("Extras does not exist, try again");
-                                    Console.WriteLine("Press any key to return to menu");
+                                    Console.WriteLine("Invalid option.\nPress any key to return to main menu");
                                     Console.ReadKey();
                                     Console.Clear();
+                                    continue;
                                 }
-
                                 break;
 
                             case "3":
-
-                                string qAllViewExtras = @$"
-                                        SELECT extras.name, price, extras.id
-                                        FROM extras";
-
+                                string qAllViewExtras = @$"SELECT extras.name, price, extras.id FROM extras";
                                 await using (var cmd = db.CreateCommand(qAllViewExtras))
                                 await using (var reader = await cmd.ExecuteReaderAsync())
                                 {
@@ -440,9 +362,8 @@ public class Booking(NpgsqlDataSource db)
                                         Console.WriteLine();
                                     }
                                 }
-
+                                Console.WriteLine("Press any key to continue");
                                 Console.ReadKey();
-
                                 break;
 
                             case "0":
@@ -450,43 +371,32 @@ public class Booking(NpgsqlDataSource db)
                                 edit = false;
                                 break;
 
-
                             default:
-
-                                Console.WriteLine("Invalid option");
-                                Console.WriteLine("Press any key to return to menu");
+                                Console.WriteLine("Invalid option.\nPress any key to return to main menu");
                                 Console.ReadKey();
                                 Console.Clear();
                                 continue;
-                                throw new Exception("CRASH!");
                         }
-
-
-
+                        throw new Exception("Unknown error");
                         break;
-
-
 
                     case "0":
                         Console.Clear();
                         edit = false;
                         break;
 
-
                     default:
-                        Console.WriteLine("Invalid option");
-                        Console.WriteLine("Press any key to return to menu");
+                        Console.WriteLine("Invalid option.\nPress any key to return to main menu");
                         Console.ReadKey();
                         Console.Clear();
                         continue;
-                        throw new Exception("CRASH!");
                 }
+                throw new Exception("Unknown error");
             }
         }
         else
         {
-            Console.WriteLine("Wrong input please try again. Enter a bookingID (number) or 0 to exit");
-            Console.WriteLine("Press any key to return to menu");
+            Console.WriteLine("Invalid option.\nPress any key to return to main menu");
             Console.ReadKey();
             Console.Clear();
         }
@@ -498,12 +408,10 @@ public class Booking(NpgsqlDataSource db)
         {
             Console.Clear();
             Console.WriteLine("Which booking would you like to delete? (Enter the bookingID)");
-            if (int.TryParse(Console.ReadLine(), out int bookingID)) // Lade till en if till tryparse
+            if (int.TryParse(Console.ReadLine(), out int bookingID))
             {
-
                 Console.Clear();
                 Console.WriteLine("Confirm delete? yes/no: ");
-
                 string answer = Console.ReadLine();
                 if (answer.ToLower() == "yes" || answer.ToLower() == "y")
                 {
@@ -530,15 +438,12 @@ public class Booking(NpgsqlDataSource db)
                     break;
                 }
             }
-            else // Lade till en else till tryparse
+            else 
             {
-                Console.WriteLine("Booking does not exist, try again");
-                Console.WriteLine("Press any key to return to menu");
+                Console.WriteLine("Invalid option.\nPress any key to return to main menu");
                 Console.ReadKey();
                 Console.Clear();
             }
         }
     }
-
-
 }
