@@ -151,7 +151,7 @@ public class Search(NpgsqlDataSource db)
                                     case 3:
                                         Console.Clear();
                                         Console.WriteLine(
-                                            "Choose desired amenity. Enter keywords eg. pool, childclub, night entertainment or restaurant"); //skriv ut fler keywords
+                                            "Choose desired amenity. Enter keywords eg. pool, childclub, night entertainment or restaurant");
                                         Console.WriteLine("1: Pool");
                                         Console.WriteLine("2: Childclub");
                                         Console.WriteLine("3: Night entertainment");
