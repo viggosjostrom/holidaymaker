@@ -74,7 +74,7 @@ public class SetupDB()
 
 	CREATE TABLE IF NOT EXISTS booking_x_extras(
 	id SERIAL PRIMARY KEY,
-	booking_id SERIAL REFERENCES booking(id),
+	booking_id SERIAL REFERENCES booking(id) ON DELETE CASCADE,
 	extras_id SERIAL REFERENCES extras(id)	
 	);
 

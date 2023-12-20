@@ -436,18 +436,16 @@ public class Booking(NpgsqlDataSource db)
                 {
                     await using (var cmd2 = db.CreateCommand($"DELETE FROM public.booking WHERE id = {bookingID}"))
                     {
-                        await using (var cmd1 = db.CreateCommand($"DELETE FROM public.customer_x_booking WHERE booking_id = {bookingID}"))
-                        {
-                            await cmd1.ExecuteNonQueryAsync();
-                        }
                         await cmd2.ExecuteNonQueryAsync();
                     }
                     Console.Clear();
+                    Console.WriteLine($"You have now deleted booking: {bookingID}");
                     break;
                 }
                 else if (delete == 2)
                 {
                     Console.Clear();
+                    Console.WriteLine("You have aborted the delete booking sequence");
                     break;
                 }
                 else
