@@ -313,10 +313,10 @@ public class Booking(NpgsqlDataSource db)
                                         break;
 
                                     case 2:
-                                        Console.Clear();
                                         await using (var cmd = db.CreateCommand(qViewExtras))
                                         await using (var reader = await cmd.ExecuteReaderAsync())
                                         {
+                                            Console.Clear();
                                             Console.WriteLine("Your current extras: ");
                                             while (await reader.ReadAsync())
                                             {
@@ -353,6 +353,7 @@ public class Booking(NpgsqlDataSource db)
                                         await using (var cmd = db.CreateCommand(qAllViewExtras))
                                         await using (var reader = await cmd.ExecuteReaderAsync())
                                         {
+                                            Console.Clear();
                                             Console.WriteLine("All extras: ");
                                             while (await reader.ReadAsync())
                                             {
@@ -364,6 +365,7 @@ public class Booking(NpgsqlDataSource db)
                                         }
                                         Console.WriteLine("Press any key to continue");
                                         Console.ReadKey();
+                                        Console.Clear();
                                         break;
 
                                     case 0:
