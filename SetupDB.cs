@@ -12,7 +12,6 @@ public class SetupDB()
 	public static async Task NewDB()
 	{
 		string dbUri = "Host=localhost;Port=5455;Username=postgres;Password=postgres;Database=holidaymaker";
-
 		await using var db = NpgsqlDataSource.Create(dbUri);
 		await using var cmd = db.CreateCommand(@"
 

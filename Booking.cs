@@ -110,7 +110,6 @@ public class Booking(NpgsqlDataSource db)
                             continue;
                         }
                     }
-
                     int count = 1;
                     for (int i = 0; i < totalCustomers; i++)
                     {
@@ -156,7 +155,6 @@ public class Booking(NpgsqlDataSource db)
                                 command.Parameters.AddWithValue(DoB);
                                 Console.WriteLine();
                             }
-
                             int? newCustomerId = (int?)await command.ExecuteScalarAsync();
                             await using (var comm = db.CreateCommand($"INSERT INTO customer_x_booking (booking_id, customer_id) VALUES ({lastBookingId}, {newCustomerId})"))
                             {
@@ -401,7 +399,6 @@ public class Booking(NpgsqlDataSource db)
                             Console.Clear();
                             continue;
                     }
-                    throw new Exception("Unknown error");
                 }
                 else
                 {
@@ -429,6 +426,7 @@ public class Booking(NpgsqlDataSource db)
             if (int.TryParse(Console.ReadLine(), out int bookingID))
             {
                 Console.Clear();
+                Console.WriteLine("Are you sure you want to delete the booking?");
                 Console.WriteLine("1: Yes.");
                 Console.WriteLine("2: No. ");
                 if (int.TryParse(Console.ReadLine(), out int delete))
