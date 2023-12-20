@@ -34,6 +34,10 @@ public class Ending
         int duration = 400;
         int delay = 250;
 
+        Thread.Sleep(delay);
+        Thread.Sleep(delay);
+
+
         Console.Beep(E5, duration);
         Console.Beep(E5, duration);
         Console.Beep(E5, duration);

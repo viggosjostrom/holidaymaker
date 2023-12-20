@@ -5,43 +5,43 @@ using System.Runtime.InteropServices;
 
 //await SetupDB.NewDB();
 //kommentera bort för ny Databas setup
+
 string dbUri = "Host=localhost;Port=5455;Username=postgres;Password=postgres;Database=holidaymaker";
 await using var db = NpgsqlDataSource.Create(dbUri);
 
 while (true)
 {
 
-    Console.WriteLine("1: Register new customer");
-    Console.WriteLine("2: New booking");
-    Console.WriteLine("3: Edit booking");
-    Console.WriteLine("4: Delete booking");
+    Console.WriteLine("1: New booking");
+    Console.WriteLine("2: Edit booking");
+    Console.WriteLine("3: Delete booking");
+    Console.WriteLine("4: Register new customer");
     Console.WriteLine("0: EXIT");
 
     if (int.TryParse(Console.ReadLine(), out int userInput))
     {
         switch (userInput)
         {
-            case 1:
 
-                Register r = new Register(db);
-                await r.Customer();
+            case 1:
+                Console.Clear();
+                Search avaliable = new Search(db);
+                await avaliable.Rooms();
                 continue;
 
             case 2:
-                Console.Clear();
-                SearchFunctions q = new SearchFunctions(db);
-                await q.AvaliableRooms();
+                Booking info = new Booking(db);
+                await info.Edit();
                 continue;
 
             case 3:
-
-                Booking e = new Booking(db);
-                await e.Edit();
+                Booking booking = new Booking(db);
+                await booking.Delete();
                 continue;
 
             case 4:
-                Booking d = new Booking(db);
-                await d.Delete();
+                Register register = new Register(db);
+                await register.Customer();
                 continue;
 
             case 0:
@@ -61,11 +61,11 @@ while (true)
     }
     else
     {
-        Console.WriteLine("Wrong input");
-        Console.WriteLine("Press any key to go back to main menu");
+        Console.WriteLine("Invalid option.\nPress any key to return to main menu");
         Console.ReadKey();
+        Console.Clear();
         continue;
     }
 
-    throw new Exception("Program not loaded, shuting down");
+    throw new Exception("Unknown error");
 }

@@ -9,15 +9,10 @@ namespace holidaymaker;
 
 public class Register(NpgsqlDataSource db)
 {
-
     public async Task Customer()
-
     {
-
-
         await using (var cmd = db.CreateCommand("INSERT INTO customer (firstname, lastname, email, phone, date_of_birth) VALUES ($1, $2, $3, $4, $5)"))
         {
-
             Console.Write("Firstname: ");
             cmd.Parameters.AddWithValue(Console.ReadLine());
             Console.WriteLine();
@@ -39,15 +34,9 @@ public class Register(NpgsqlDataSource db)
             cmd.Parameters.AddWithValue(date);
             Console.WriteLine();
 
-
             await cmd.ExecuteNonQueryAsync();
         }
-
-
-
         Console.WriteLine("innan break");
         Console.ReadKey();
-
     }
-
 }
