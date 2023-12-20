@@ -60,7 +60,7 @@ public class Search(NpgsqlDataSource db)
             bool searchmenu = true;
             while (searchmenu)
             {
-                await Console.Out.WriteLineAsync("Pick an option.\n\n1. Filter\n\n2. Order by\n\n3. Search room.\n\n4. Start booking\n\n5. Return to main menu");
+                await Console.Out.WriteLineAsync("Pick an option.\n\n1. Filter\n\n2. Order by\n\n3. Search room\n\n4. Start booking\n\n5. Reset filter\n\n6. Return to main menu");
                 if (int.TryParse(Console.ReadLine(), out int searchInput))
                 {
 
@@ -68,7 +68,7 @@ public class Search(NpgsqlDataSource db)
                     {
                         case 1:
                             Console.Clear();
-                            await Console.Out.WriteLineAsync("Pick an option.\n1. City\n2. Sqm.\n3. Amenities.\n4. Dist to Beach.\n5. Dist to Centrum.\n6. Reset all filters.\n7.Return.");
+                            await Console.Out.WriteLineAsync("Pick an option.\n1. City\n2. Sqm.\n3. Amenities.\n4. Dist to Beach.\n5. Dist to Centrum.\n6. Return.");
                             if (int.TryParse(Console.ReadLine(), out int caseOne))
                             {
 
@@ -254,17 +254,6 @@ public class Search(NpgsqlDataSource db)
                                         }
                                     case 6:
                                         Console.Clear();
-                                        beachDistance = string.Empty;
-                                        centrumDistance = string.Empty;
-                                        roomSqm = string.Empty;
-                                        Amenity = string.Empty;
-                                        cityChoice = string.Empty;
-                                        Console.WriteLine("Filters reset! Press any key to continue");
-                                        Console.ReadKey();
-                                        continue;
-
-                                    case 7:
-                                        Console.Clear();
                                         break;
 
                                     default:
@@ -415,6 +404,17 @@ public class Search(NpgsqlDataSource db)
                             continue;
 
                         case 5:
+                            Console.Clear();
+                            beachDistance = string.Empty;
+                            centrumDistance = string.Empty;
+                            roomSqm = string.Empty;
+                            Amenity = string.Empty;
+                            cityChoice = string.Empty;
+                            Console.WriteLine("Filters reset! Press any key to continue");
+                            Console.ReadKey();
+                            break;
+
+                        case 6:
                             await Console.Out.WriteLineAsync("Return to main menu.");
                             roomLoop = false;
                             searchmenu = false;
